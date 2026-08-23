@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full-Stack Python & AI / ML Development - Student Lecture Sheet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #e0e7ff;
+            --accent: #06b6d4;
+            --accent-orange: #f97316;
+            --success: #10b981;
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header & Hero Section */
+        .hero-banner {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #0f172a 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            margin-bottom: 2rem;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .badge-main {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            border: 1px solid rgba(129, 140, 248, 0.3);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 60%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .tech-pill-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .tech-pill {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border-color);
+            color: #cbd5e1;
+            padding: 0.35rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .metric-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1.25rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #818cf8;
+        }
+
+        /* Roadmap Section */
+        .roadmap-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .section-header-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--primary) 0%, transparent 100%);
+        }
+
+        .roadmap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .roadmap-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.25rem;
+            position: relative;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .roadmap-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+        }
+
+        .roadmap-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent-orange);
+            margin-bottom: 0.5rem;
+        }
+
+        .roadmap-card h4 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+            color: #fff;
+        }
+
+        .roadmap-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Phase Filter Navigation */
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+            position: sticky;
+            top: 1rem;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.95);
+            padding: 0.75rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        /* Phase Container & Class Cards */
+        .phase-block {
+            margin-bottom: 3rem;
+            scroll-margin-top: 5rem;
+        }
+
+        .phase-header {
+            background: linear-gradient(90deg, rgba(79, 70, 229, 0.2) 0%, rgba(30, 41, 59, 0.5) 100%);
+            border-left: 4px solid var(--primary);
+            padding: 1.25rem 1.5rem;
+            border-radius: 0 16px 16px 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .phase-header h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .phase-header p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .class-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.25s ease, border-color 0.25s ease;
+        }
+
+        .class-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .class-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .class-badge {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, #ea580c 100%);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            padding: 0.5rem 0.85rem;
+            border-radius: 12px;
+            min-width: 80px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);
+        }
+
+        .class-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            line-height: 1.3;
+        }
+
+        .topic-box {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            padding: 1rem;
+            border-left: 3px solid var(--primary);
+        }
+
+        .topic-box.topic-2 {
+            border-left-color: var(--accent);
+        }
+
+        .topic-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 0.35rem;
+        }
+
+        .topic-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .hometask-box {
+            background: rgba(249, 115, 22, 0.08);
+            border: 1px dashed rgba(249, 115, 22, 0.4);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: auto;
+        }
+
+        .hometask-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-orange);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .hometask-desc {
+            font-size: 0.85rem;
+            color: #e2e8f0;
+        }
+
+        /* Assessment Plan Section */
+        .assessment-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .assessment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .assessment-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .assessment-num {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .assessment-info h4 {
+            font-size: 1rem;
+            color: #fff;
+            margin-bottom: 0.2rem;
+        }
+
+        .assessment-info .timing {
+            font-size: 0.75rem;
+            color: var(--accent-orange);
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+
+        .assessment-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Print Media Styles for PDF Export */
+        @media print {
+            body {
+                background-color: #fff;
+                color: #0f172a;
+                padding: 0;
+            }
+            .hero-banner {
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                box-shadow: none;
+                color: #0f172a;
+            }
+            .hero-title {
+                background: none;
+                -webkit-text-fill-color: initial;
+                color: #1e1b4b;
+            }
+            .nav-tabs {
+                display: none;
+            }
+            .class-card {
+                background: #fff;
+                border: 1px solid #e2e8f0;
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+            .topic-box {
+                background: #f8fafc;
+                border-left-color: #4f46e5;
+            }
+            .hometask-box {
+                background: #fff7ed;
+                border-color: #fdba74;
+            }
+            .class-title {
+                color: #0f172a;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Hero Header -->
+    <header class="hero-banner">
+        <span class="badge-main">Student Edition • Lecture Sheet</span>
+        <h1 class="hero-title">Full-Stack Python & AI / ML Development</h1>
+        <p class="hero-subtitle">Professional 3-Month Course Outline & Student Roadmap</p>
+
+        <div class="tech-pill-container">
+            <span class="tech-pill">Python 3.12+</span>
+            <span class="tech-pill">NumPy</span>
+            <span class="tech-pill">Pandas</span>
+            <span class="tech-pill">Seaborn</span>
+            <span class="tech-pill">PostgreSQL</span>
+            <span class="tech-pill">Scikit-Learn</span>
+            <span class="tech-pill">XGBoost</span>
+            <span class="tech-pill">PyTorch</span>
+            <span class="tech-pill">OpenCV</span>
+            <span class="tech-pill">HuggingFace</span>
+            <span class="tech-pill">Ollama</span>
+            <span class="tech-pill">ChromaDB</span>
+            <span class="tech-pill">LangChain</span>
+            <span class="tech-pill">FastAPI</span>
+            <span class="tech-pill">Docker</span>
+            <span class="tech-pill">CI/CD</span>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Duration</div>
+                <div class="metric-value">3 Months</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Teaching Sessions</div>
+                <div class="metric-value">30 Classes</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Assessments</div>
+                <div class="metric-value">6 Milestone Exams</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Learning Model</div>
+                <div class="metric-value">Project-Driven</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Student Success Roadmap -->
+    <section class="roadmap-section">
+        <div class="section-header">
+            <h2>Student Success Roadmap — How to Excel</h2>
+            <div class="section-header-line"></div>
+        </div>
+
+        <div class="roadmap-grid">
+            <div class="roadmap-card">
+                <div class="roadmap-num">01 • Learn</div>
+                <h4>Theoretical Foundations</h4>
+                <p>Master core programming, math, and AI concepts thoroughly before writing code.</p>
+            </div>
+            <div class="roadmap-card">
+                <div class="roadmap-num">02 • Practice</div>
+                <h4>Hands-on Execution</h4>
+                <p>Solve class coding exercises and complete the practical home task problem after each lecture.</p>
+            </div>
+            <div class="roadmap-card">
+                <div class="roadmap-num">03 • Build</div>
+                <h4>Progressive Capstone</h4>
+                <p>Integrate every newly learned skill into your enterprise AI platform module by module.</p>
+            </div>
+            <div class="roadmap-card">
+                <div class="roadmap-num">04 • Ship</div>
+                <h4>Deploy & Present</h4>
+                <p>Containerize with Docker, deploy via GitHub Actions CI/CD to live servers, and defend in viva.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Navigation Bar -->
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="filterPhase('all')">All Classes</button>
+        <button class="tab-btn" onclick="filterPhase('phase1')">Phase 1: Python Core</button>
+        <button class="tab-btn" onclick="filterPhase('phase2')">Phase 2: Data Science</button>
+        <button class="tab-btn" onclick="filterPhase('phase3')">Phase 3: Machine Learning</button>
+        <button class="tab-btn" onclick="filterPhase('phase4')">Phase 4: Deep Learning & Vision</button>
+        <button class="tab-btn" onclick="filterPhase('phase5')">Phase 5: Gen AI & LLMs</button>
+        <button class="tab-btn" onclick="filterPhase('phase6')">Phase 6: MLOps & Deployment</button>
+        <button class="tab-btn" onclick="filterPhase('assessment')">Assessments</button>
+    </nav>
+
+    <!-- PHASE 1 -->
+    <section id="phase1" class="phase-block">
+        <div class="phase-header">
+            <h3>Phase 1 — Python Core Foundations & Algorithmic Thinking</h3>
+            <p>Classes 01 to 05 • Build a solid programming base, OOP structures, error handling, and environment isolation.</p>
+        </div>
+
+        <div class="class-grid">
+            <!-- Class 01 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 01</div>
+                    <div class="class-title">Python Fundamentals & Environment Setup</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Ecosystem & VS Code Workflow</div>
+                    <div class="topic-desc">Python 3.12 installation, VS Code setup, virtual environment isolation (venv/conda), pip package manager, and script execution.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Syntax, Variables & Primitive Types</div>
+                    <div class="topic-desc">Dynamic typing, numbers, strings, booleans, string formatting (f-strings), type casting, and standard I/O operations.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Set up a clean virtual environment and write an interactive CLI profile utility that processes inputs and displays metric summaries.</div>
+                </div>
+            </div>
+
+            <!-- Class 02 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 02</div>
+                    <div class="class-title">Data Structures & Control Flow</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Control Flow & Branching</div>
+                    <div class="topic-desc">If/elif/else conditions, truthy/falsy evaluation, ternary operators, while/for loops, range, and loop controls (break, continue).</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Built-in Data Structures</div>
+                    <div class="topic-desc">Lists, Tuples, Sets, Dictionaries, sequence slicing, mutability vs immutability, lookup performance, and core methods.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Build a CLI Student Performance System that tracks student records, computes averages, and filters top performers.</div>
+                </div>
+            </div>
+
+            <!-- Class 03 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 03</div>
+                    <div class="class-title">Functions, Modules & Functional Patterns</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Reusable Function Design</div>
+                    <div class="topic-desc">Defining functions, positional/keyword parameters, *args, **kwargs, return types, docstrings, type hinting, and variable scope.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Functional Programming & Comprehensions</div>
+                    <div class="topic-desc">Lambda functions, map(), filter(), list/dict/set comprehensions, generator expressions, and custom package creation.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Create reusable math & string processing modules using list comprehensions and lambda filters to process nested dataset lists.</div>
+                </div>
+            </div>
+
+            <!-- Class 04 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 04</div>
+                    <div class="class-title">Object-Oriented Programming (OOP)</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Classes, Objects & Encapsulation</div>
+                    <div class="topic-desc">Classes, __init__ constructor, instance vs class attributes, magic dunder methods (__str__, __repr__), private members, and @property.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Inheritance & Polymorphism</div>
+                    <div class="topic-desc">Single/multiple inheritance, super(), method overriding, Abstract Base Classes (abc module), duck typing, and composition.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Design an OOP Banking System with Account, Customer, Transaction, and Bank classes with balance validation and transaction logs.</div>
+                </div>
+            </div>
+
+            <!-- Class 05 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 05</div>
+                    <div class="class-title">File Handling, Exceptions & Packages</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — File I/O & Serialization</div>
+                    <div class="topic-desc">Reading/writing TXT, CSV, JSON files, context managers ('with' statement), pathlib file operations, and JSON serialization.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Exception Handling & Environment Isolation</div>
+                    <div class="topic-desc">Try/except/else/finally blocks, custom exception classes, requirements.txt management, and python-dotenv environment isolation.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Build a robust CSV Importer & JSON Generator that validates raw schema, handles exceptions safely, and logs error metrics.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PHASE 2 -->
+    <section id="phase2" class="phase-block">
+        <div class="phase-header">
+            <h3>Phase 2 — Data Science Foundations & Numerical Computing</h3>
+            <p>Classes 06 to 10 • High-performance computing with NumPy, Pandas data wrangling, EDA visualization, statistics, and SQL.</p>
+        </div>
+
+        <div class="class-grid">
+            <!-- Class 06 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 06</div>
+                    <div class="class-title">High-Performance Computing with NumPy</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — NumPy Ndarrays & Vectorization</div>
+                    <div class="topic-desc">N-dimensional array creation, dtypes, reshaping, array slicing, broadcasting rules, and vectorized math vs Python loops.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Matrix Math & Statistical Operations</div>
+                    <div class="topic-desc">Matrix multiplication (@), np.linalg operations, np.random sampling, boolean masking, and axis aggregations (mean, std, sum).</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Build a financial portfolio risk simulator using vectorized NumPy arrays to compute covariance matrices and 1,000 Monte Carlo runs.</div>
+                </div>
+            </div>
+
+            <!-- Class 07 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 07</div>
+                    <div class="class-title">Data Wrangling & Manipulation with Pandas</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — DataFrames & Indexing</div>
+                    <div class="topic-desc">Series & DataFrames, loc/iloc indexing, boolean filtering, missing data treatment (fillna, dropna), and data type conversion.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Groupby, Merging & Pivot Tables</div>
+                    <div class="topic-desc">Groupby aggregations, pivot tables, table merges (merge, concat, join), custom functions (.apply()), and datetime parsing.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Clean and merge a multi-table e-commerce dataset, handling missing values and aggregating revenue metrics per category.</div>
+                </div>
+            </div>
+
+            <!-- Class 08 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 08</div>
+                    <div class="class-title">Data Visualization & Exploratory Data Analysis (EDA)</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Statistical Visualizations</div>
+                    <div class="topic-desc">Line plots, bar charts, histograms, KDE density plots, box plots, scatter plots, pair plots, and Seaborn heatmaps.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Exploratory Data Analysis (EDA)</div>
+                    <div class="topic-desc">Detecting distribution skewness, feature correlation analysis, outlier detection, and drafting actionable data summary reports.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Perform complete EDA on a Telecom Churn dataset, generating 6 publication-ready charts and an executive insight summary.</div>
+                </div>
+            </div>
+
+            <!-- Class 09 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 09</div>
+                    <div class="class-title">Applied Statistics & Probability for ML</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Descriptive & Inferential Statistics</div>
+                    <div class="topic-desc">Mean, median, mode, variance, std dev, Normal/Binomial distributions, Z-scores, and Central Limit Theorem (CLT).</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Hypothesis Testing & Correlation</div>
+                    <div class="topic-desc">Null/alternative hypotheses, p-values, t-tests, Chi-Square test, ANOVA, Pearson/Spearman correlation, and confidence intervals.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Conduct an A/B test analysis on e-commerce landing page conversion rates using SciPy, computing p-values and confidence intervals.</div>
+                </div>
+            </div>
+
+            <!-- Class 10 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 10</div>
+                    <div class="class-title">Relational Databases, SQL & Python Integration</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — SQL Queries & Schema Design</div>
+                    <div class="topic-desc">Tables, datatypes, PK/FK constraints, SELECT, WHERE, JOIN (INNER, LEFT), GROUP BY, HAVING, subqueries, and window functions.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — SQLAlchemy & Python Connectivity</div>
+                    <div class="topic-desc">Connecting Python to PostgreSQL via psycopg2/SQLAlchemy ORM models, session management, and querying into Pandas.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Build a Python script connecting to PostgreSQL, populate normalized sales tables, execute complex queries, and export DataFrames.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PHASE 3 -->
+    <section id="phase3" class="phase-block">
+        <div class="phase-header">
+            <h3>Phase 3 — Machine Learning Core & Predictive Modeling</h3>
+            <p>Classes 11 to 15 • Scikit-Learn pipelines, regression, tree ensembles (XGBoost), clustering, and hyperparameter tuning.</p>
+        </div>
+
+        <div class="class-grid">
+            <!-- Class 11 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 11</div>
+                    <div class="class-title">ML Workflow & Scikit-Learn Pipeline</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — ML Formulation & Preprocessing</div>
+                    <div class="topic-desc">Supervised vs unsupervised learning, features/target, train_test_split, preventing data leakage, scaling, and categorical encoders.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Scikit-Learn Estimators & Pipelines</div>
+                    <div class="topic-desc">Fit/transform/predict API, ColumnTransformer, multi-step Pipeline objects, and model serialization with joblib.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Build a production Scikit-Learn pipeline preprocessing mixed numerical/categorical data and serializing the model artifact.</div>
+                </div>
+            </div>
+
+            <!-- Class 12 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 12</div>
+                    <div class="class-title">Supervised Learning I — Regression Models</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Linear, Ridge & Lasso Regression</div>
+                    <div class="topic-desc">Ordinary Least Squares math, gradient descent, cost functions, L1 (Lasso) vs L2 (Ridge) regularization, and feature selection.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Regression Metrics & Residuals</div>
+                    <div class="topic-desc">MSE, RMSE, MAE, R-squared (R2), Adjusted R2, residual plots, homoscedasticity checks, and model evaluation metrics.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Develop a House Price Prediction model using regularized regression, analyze coefficient importances, and plot error residuals.</div>
+                </div>
+            </div>
+
+            <!-- Class 13 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 13</div>
+                    <div class="class-title">Classification & Tree Ensemble Algorithms</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Classification Algorithms</div>
+                    <div class="topic-desc">Logistic Regression, Decision Trees, K-Nearest Neighbors (KNN), Naive Bayes, Support Vector Machines (SVM), decision boundaries.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Random Forest, XGBoost & SMOTE</div>
+                    <div class="topic-desc">Bagging vs Boosting, Random Forests, XGBoost gradient boosting, feature importances, and SMOTE for imbalanced classes.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Train a Credit Risk Classifier using Random Forest & XGBoost, apply SMOTE class balancing, and plot ROC-AUC curves.</div>
+                </div>
+            </div>
+
+            <!-- Class 14 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 14</div>
+                    <div class="class-title">Unsupervised Learning — Clustering & PCA</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Clustering Algorithms</div>
+                    <div class="topic-desc">K-Means clustering, distance metrics, Elbow Method, Silhouette scores, Hierarchical Clustering (Dendrograms), and DBSCAN.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Dimensionality Reduction (PCA)</div>
+                    <div class="topic-desc">Principal Component Analysis (PCA) variance maximization, eigenvalues intuition, explained variance, and t-SNE / UMAP visualization.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Segment an e-commerce customer database using K-Means and PCA, visualizing customer clusters in 2D and detailing buyer personas.</div>
+                </div>
+            </div>
+
+            <!-- Class 15 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 15</div>
+                    <div class="class-title">Model Evaluation & Hyperparameter Optimization</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Validation Strategies & Diagnostic Metrics</div>
+                    <div class="topic-desc">K-Fold & Stratified Cross-Validation, Confusion Matrix, Precision, Recall, F1-Score, Macro/Micro averages, and ROC-AUC.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Hyperparameter Search & Optuna</div>
+                    <div class="topic-desc">GridSearchCV, RandomizedSearchCV, Bayesian Optimization using Optuna, hyperparameter search spaces, and overfitting prevention.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Optimize an XGBoost pipeline using Optuna and Stratified 5-Fold CV, generating full classification reports and ROC curves.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PHASE 4 -->
+    <section id="phase4" class="phase-block">
+        <div class="phase-header">
+            <h3>Phase 4 — Deep Learning, Neural Networks & Computer Vision</h3>
+            <p>Classes 16 to 20 • PyTorch tensors, custom neural network training loops, OpenCV image processing, CNNs, and NLP.</p>
+        </div>
+
+        <div class="class-grid">
+            <!-- Class 16 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 16</div>
+                    <div class="class-title">Deep Learning & PyTorch Core Tensors</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Perceptrons & PyTorch Tensors</div>
+                    <div class="topic-desc">Activation functions (ReLU, Sigmoid, Softmax), PyTorch tensor math, CUDA GPU acceleration, autograd automatic differentiation.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Custom Dataset & DataLoader API</div>
+                    <div class="topic-desc">Subclassing torch.utils.data.Dataset, DataLoader mini-batching, shuffling, dataset splitting, and image transformations.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Write a custom PyTorch Dataset & DataLoader class, execute tensor math on GPU/CPU, and verify autograd gradient updates.</div>
+                </div>
+            </div>
+
+            <!-- Class 17 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 17</div>
+                    <div class="class-title">Custom Neural Networks & Training Loops</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Building Custom nn.Module</div>
+                    <div class="topic-desc">Linear layers (nn.Linear), activations, dropout regularization (nn.Dropout), batch normalization, and forward pass execution.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Complete Training & Evaluation Loop</div>
+                    <div class="topic-desc">Loss functions (CrossEntropyLoss), optimizers (AdamW, SGD), learning rate schedulers, evaluation loops, and model checkpointing.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Build and train an MLP image classifier on Fashion-MNIST in PyTorch, plotting loss/accuracy curves and saving best checkpoints.</div>
+                </div>
+            </div>
+
+            <!-- Class 18 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 18</div>
+                    <div class="class-title">Computer Vision Essentials with OpenCV</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Image Processing Foundations</div>
+                    <div class="topic-desc">Color spaces (RGB, BGR, HSV), image resizing, cropping, rotation, affine transformations, thresholding, and morphological operations.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Contours & Feature Detection</div>
+                    <div class="topic-desc">Sobel/Canny edge detection, finding contours (cv2.findContours), bounding boxes, histogram equalization, and object tracking.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Build an automated document scanner script in OpenCV that detects page edges, applies perspective warping, and crops scanned pages.</div>
+                </div>
+            </div>
+
+            <!-- Class 19 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 19</div>
+                    <div class="class-title">CNNs & Transfer Learning</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — CNN Architecture & Convolutions</div>
+                    <div class="topic-desc">nn.Conv2d, pooling layers (nn.MaxPool2d), stride, padding, receptive fields, and CNN feature map visualization.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Transfer Learning Backbones</div>
+                    <div class="topic-desc">Fine-tuning ResNet50/EfficientNet with torchvision, frozen vs trainable weights, classification heads, and data augmentations.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Build an image classifier (e.g. leaf disease detector) using transfer learning with ResNet50 in PyTorch, achieving >90% test accuracy.</div>
+                </div>
+            </div>
+
+            <!-- Class 20 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 20</div>
+                    <div class="class-title">NLP Fundamentals & Sequence Models</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Text Processing & Embeddings</div>
+                    <div class="topic-desc">Tokenization, lowercasing, stopword removal, TF-IDF, Word2Vec embeddings, and PyTorch nn.Embedding layers.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — RNNs, LSTMs & Transformer Attention</div>
+                    <div class="topic-desc">Recurrent neural networks, LSTMs, vanishing gradients, self-attention mechanism intuition, and Transformer architecture basics.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Train a sentiment analysis model using a PyTorch LSTM network on movie reviews, using custom tokenization and embeddings.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PHASE 5 -->
+    <section id="phase5" class="phase-block">
+        <div class="phase-header">
+            <h3>Phase 5 — Applied AI, Generative AI & LLMs</h3>
+            <p>Classes 21 to 25 • Hugging Face Transformers, local Ollama execution, ChromaDB Vector Search, RAG, AI Agents & FastAPI.</p>
+        </div>
+
+        <div class="class-grid">
+            <!-- Class 21 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 21</div>
+                    <div class="class-title">Hugging Face & Pretrained Transformers</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Hugging Face Hub & AutoModels</div>
+                    <div class="topic-desc">Loading pretrained LLMs (AutoModelForCausalLM), generation parameters (temperature, top_p), and Hugging Face pipelines.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Fine-Tuning & Quantization</div>
+                    <div class="topic-desc">PEFT (Parameter-Efficient Fine-Tuning), LoRA/QLoRA adapters, 4-bit model quantization, and Hugging Face SFTTrainer.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Load an open-weights LLM (Llama-3-8B / Qwen-2.5) via Hugging Face, run text generation pipelines, and build a text summarizer.</div>
+                </div>
+            </div>
+
+            <!-- Class 22 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 22</div>
+                    <div class="class-title">Local LLMs (Ollama) & Prompt Engineering</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Local LLM Execution with Ollama</div>
+                    <div class="topic-desc">Installing Ollama, pulling local models (Llama 3.2, Mistral, DeepSeek), Modelfiles, system prompts, and python SDK integration.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Advanced Prompting & Structured JSON</div>
+                    <div class="topic-desc">Zero-shot, Few-shot, Chain-of-Thought (CoT), ReAct framework, system personas, and enforcing Pydantic JSON output schemas.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Build a local CLI Document Information Extractor powered by Ollama enforcing Pydantic JSON schema output for resume details.</div>
+                </div>
+            </div>
+
+            <!-- Class 23 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 23</div>
+                    <div class="class-title">Retrieval-Augmented Generation (RAG) & Vector DBs</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Vector Embeddings & Similarity Search</div>
+                    <div class="topic-desc">Generating embeddings with sentence-transformers, Cosine similarity, Euclidean distance, HNSW indexing, and Vector DB architecture.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — RAG Pipelines with ChromaDB</div>
+                    <div class="topic-desc">Document loading (PDF, TXT), text chunking strategies (RecursiveCharacterTextSplitter), vector indexing into ChromaDB, and context RAG.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Build a complete Document Q&A RAG application that indexes multi-page PDFs into ChromaDB and answers questions with page citations.</div>
+                </div>
+            </div>
+
+            <!-- Class 24 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 24</div>
+                    <div class="class-title">AI Agents & Workflows with LangChain</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — LangChain Core Architecture</div>
+                    <div class="topic-desc">Chains (LLMChain), memory management (BufferMemory, VectorStoreMemory), document loaders, and output parsers.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Autonomous AI Agents & Tool Calling</div>
+                    <div class="topic-desc">Defining custom Python tool functions, ReAct reasoning loops, multi-tool decision selection, error handling, and guardrails.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Build an autonomous AI Research Agent using LangChain that queries search tools, vector DBs, and compiles markdown reports.</div>
+                </div>
+            </div>
+
+            <!-- Class 25 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 25</div>
+                    <div class="class-title">Serving AI Models with FastAPI Backend</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Modern FastAPI Architecture</div>
+                    <div class="topic-desc">Async handlers (async/await), Pydantic validation schemas, Dependency Injection (Depends), CORS middleware, and API Routers.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Production REST APIs for AI</div>
+                    <div class="topic-desc">Streaming LLM responses (StreamingResponse / SSE), exception handlers, background tasks, and interactive Swagger OpenAPI docs.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Build a production FastAPI backend exposing endpoints for ML classification, vector search, and streaming LLM responses.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PHASE 6 -->
+    <section id="phase6" class="phase-block">
+        <div class="phase-header">
+            <h3>Phase 6 — MLOps, Quality Assurance & Live Cloud Deployment</h3>
+            <p>Classes 26 to 30 • MLflow tracking, Docker multi-containers, security, pytest CI/CD pipelines, and live VPS cloud setup.</p>
+        </div>
+
+        <div class="class-grid">
+            <!-- Class 26 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 26</div>
+                    <div class="class-title">Model Tracking & MLOps Pipelines</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Experiment Tracking with MLflow</div>
+                    <div class="topic-desc">Logging hyperparameters, metrics, confusion matrix artifacts, model binaries, model lineage, and MLflow Model Registry.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Data & Model Versioning (DVC)</div>
+                    <div class="topic-desc">Versioning raw datasets and model binaries with DVC (Data Version Control), remote storage backends, and reproducible pipelines.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Integrate MLflow experiment tracking into an XGBoost training script, logging parameters, metrics, artifacts, and registering models.</div>
+                </div>
+            </div>
+
+            <!-- Class 27 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 27</div>
+                    <div class="class-title">Containerization with Docker for AI/ML</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Docker Foundations & Optimization</div>
+                    <div class="topic-desc">Dockerfiles, base images (python:3.12-slim), layer caching, .dockerignore, and multi-stage build optimization for slim containers.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Multi-Container Docker Compose</div>
+                    <div class="topic-desc">Writing docker-compose.yml orchestrating FastAPI backend service, PostgreSQL container, ChromaDB container, networks, and env files.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Write Dockerfiles and docker-compose.yml to orchestrate FastAPI, PostgreSQL, and ChromaDB into a single command launch setup.</div>
+                </div>
+            </div>
+
+            <!-- Class 28 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 28</div>
+                    <div class="class-title">Production Security & Model Optimization</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — AI API Security & Secrets</div>
+                    <div class="topic-desc">API Keys, JWT authentication, rate limiting (slowapi), CORS protection, python-dotenv secrets, and prompt injection defense.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Model Optimization & Health Checks</div>
+                    <div class="topic-desc">Model quantization (ONNX Runtime), latency optimization, health check endpoints (/healthz), structured logging (structlog).</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Secure your FastAPI service by adding JWT auth, rate limiting (10 req/min), ONNX runtime acceleration, and JSON logging.</div>
+                </div>
+            </div>
+
+            <!-- Class 29 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 29</div>
+                    <div class="class-title">GitHub Actions CI/CD & Automated Testing</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — Automated Testing & Pytest</div>
+                    <div class="topic-desc">Unit testing with pytest, API testing with TestClient, linters & formatters (ruff, black, mypy), and assertion best practices.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — GitHub Actions Workflows</div>
+                    <div class="topic-desc">Writing .github/workflows/ci.yml, running test suites on pull requests, building Docker images, and container registry publishing.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Create pytest test suites for FastAPI endpoints and configure a GitHub Actions workflow executing linting, testing, and Docker builds.</div>
+                </div>
+            </div>
+
+            <!-- Class 30 -->
+            <div class="class-card">
+                <div class="class-card-header">
+                    <div class="class-badge">Class 30</div>
+                    <div class="class-title">Final Capstone Integration & Cloud Deployment</div>
+                </div>
+                <div class="topic-box">
+                    <div class="topic-name">Topic 1 — VPS Server Setup & Live Cloud Launch</div>
+                    <div class="topic-desc">Deploying to cloud servers (Render, AWS EC2, VPS), Nginx reverse proxy configuration, SSL certificates (certbot), and domain routing.</div>
+                </div>
+                <div class="topic-box topic-2">
+                    <div class="topic-name">Topic 2 — Live Monitoring & Viva Presentation</div>
+                    <div class="topic-desc">Verifying database connectivity, rollback strategies, README & Swagger API documentation, demo data seeding, and viva defence.</div>
+                </div>
+                <div class="hometask-box">
+                    <div class="hometask-title">🎯 Home Task Problem</div>
+                    <div class="hometask-desc">Deploy your complete Capstone Enterprise AI Platform to a live web URL and submit the GitHub repository with README and video demo.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ASSESSMENT PLAN -->
+    <section id="assessment" class="phase-block assessment-section">
+        <div class="section-header">
+            <h2>Assessment Plan & Final Evaluation</h2>
+            <div class="section-header-line"></div>
+        </div>
+
+        <div class="assessment-grid">
+            <div class="assessment-card">
+                <div class="assessment-num">01</div>
+                <div class="assessment-info">
+                    <h4>Assessment 1 — Python Core & OOP</h4>
+                    <div class="timing">After Class 05</div>
+                    <p>Build a CLI-based modular Python app using OOP, inheritance, custom exception handling, and file operations.</p>
+                </div>
+            </div>
+
+            <div class="assessment-card">
+                <div class="assessment-num">02</div>
+                <div class="assessment-info">
+                    <h4>Assessment 2 — Data Science & SQL</h4>
+                    <div class="timing">After Class 10</div>
+                    <p>Wrangle raw datasets in Pandas, generate EDA charts, and write analytical SQL queries in PostgreSQL via SQLAlchemy.</p>
+                </div>
+            </div>
+
+            <div class="assessment-card">
+                <div class="assessment-num">03</div>
+                <div class="assessment-info">
+                    <h4>Assessment 3 — Scikit-Learn ML Pipeline</h4>
+                    <div class="timing">After Class 15</div>
+                    <p>Train and tune an XGBoost model pipeline with Optuna hyperparameter optimization, cross-validation, and joblib serialization.</p>
+                </div>
+            </div>
+
+            <div class="assessment-card">
+                <div class="assessment-num">04</div>
+                <div class="assessment-info">
+                    <h4>Assessment 4 — PyTorch & Vision Classifier</h4>
+                    <div class="timing">After Class 20</div>
+                    <p>Build a PyTorch CNN / Transfer Learning image classification pipeline with custom DataLoader, loss curves, and evaluation metrics.</p>
+                </div>
+            </div>
+
+            <div class="assessment-card">
+                <div class="assessment-num">05</div>
+                <div class="assessment-info">
+                    <h4>Assessment 5 — Full-Stack RAG & FastAPI</h4>
+                    <div class="timing">After Class 25</div>
+                    <p>Construct an async FastAPI service with ChromaDB vector search, Ollama / HuggingFace LLM response generation, and SSE streaming.</p>
+                </div>
+            </div>
+
+            <div class="assessment-card">
+                <div class="assessment-num">06</div>
+                <div class="assessment-info">
+                    <h4>Assessment 6 — Capstone Evaluation & Viva</h4>
+                    <div class="timing">After Class 30</div>
+                    <p>Present live deployed Capstone AI platform, complete code review viva, and submit source code, Docker setup, and documentation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>Full-Stack Python & AI / ML Development • Professional Student Lecture Sheet • Latest Tech Stack 2026</p>
+        <p style="margin-top: 0.5rem; color: #818cf8; font-weight: 600; font-size: 0.95rem;">Developed by: Robiul Suny Emon</p>
+    </footer>
+
+</div>
+
+<script>
+    function filterPhase(phaseId) {
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        event.target.classList.add('active');
+
+        const phases = document.querySelectorAll('.phase-block');
+        phases.forEach(phase => {
+            if (phaseId === 'all') {
+                phase.style.display = 'block';
+            } else if (phase.id === phaseId) {
+                phase.style.display = 'block';
+            } else {
+                phase.style.display = 'none';
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
