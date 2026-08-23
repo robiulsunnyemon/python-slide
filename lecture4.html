@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 04: Python Loops, Iteration & Automation</title>
+    <meta name="description" content="Python Fundamentals Lecture 04 Slides: while loops, for loops, range(), break, continue, for-else, enumerate(), zip(), and automation scripts.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0a0d14;
+            --bg-secondary: #111622;
+            --bg-card: rgba(22, 30, 46, 0.75);
+            --bg-card-hover: rgba(30, 41, 64, 0.9);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(251, 146, 60, 0.3);
+            
+            --python-blue: #38bdf8;
+            --python-yellow: #facc15;
+            --accent-green: #4ade80;
+            --accent-purple: #a855f7;
+            --accent-rose: #fb7185;
+            --accent-orange: #fb923c;
+            --accent-amber: #f59e0b;
+            --accent-cyan: #22d3ee;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --font-main: 'Outfit', 'Inter', sans-serif;
+            --font-code: 'Fira Code', monospace;
+            
+            --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Animated Ambient Background Grid */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 18% 22%, rgba(251, 146, 60, 0.09) 0%, transparent 40%),
+                radial-gradient(circle at 82% 78%, rgba(250, 204, 21, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.04) 0%, transparent 50%),
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Top Header Navigation */
+        header {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 36px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(10, 13, 20, 0.85);
+            backdrop-filter: blur(12px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-orange), var(--python-yellow));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #050811;
+            font-weight: 800;
+            font-size: 19px;
+            box-shadow: 0 4px 15px rgba(251, 146, 60, 0.3);
+        }
+
+        .brand-text h1 {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .lecture-nav-pill {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 11.5px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: var(--transition-smooth);
+        }
+
+        .lecture-nav-pill:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            border-color: var(--accent-orange);
+        }
+
+        .lecture-nav-pill.active {
+            background: rgba(251, 146, 60, 0.18);
+            color: var(--accent-orange);
+            border-color: var(--accent-orange);
+        }
+
+        .top-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-icon:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-orange);
+            background: var(--bg-card-hover);
+            transform: translateY(-1px);
+        }
+
+        .slide-counter {
+            font-family: var(--font-code);
+            font-size: 13.5px;
+            font-weight: 600;
+            background: rgba(251, 146, 60, 0.12);
+            color: var(--accent-orange);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(251, 146, 60, 0.25);
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-orange), var(--python-yellow), var(--python-blue));
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 12px rgba(251, 146, 60, 0.6);
+        }
+
+        /* Main Presentation Viewport */
+        main.presentation-stage {
+            position: relative;
+            z-index: 10;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 40px;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            max-width: 1220px;
+            height: 100%;
+            max-height: 690px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(60px) scale(0.97);
+            transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.45s;
+            pointer-events: none;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .slide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .slide.prev {
+            transform: translateX(-60px) scale(0.97);
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Slide Component Styles */
+        .slide-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+        .tag-blue { background: rgba(56, 189, 248, 0.15); color: var(--python-blue); border: 1px solid rgba(56, 189, 248, 0.3); }
+        .tag-yellow { background: rgba(250, 204, 21, 0.15); color: var(--python-yellow); border: 1px solid rgba(250, 204, 21, 0.3); }
+        .tag-green { background: rgba(74, 222, 128, 0.15); color: var(--accent-green); border: 1px solid rgba(74, 222, 128, 0.3); }
+        .tag-purple { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+        .tag-rose { background: rgba(251, 113, 133, 0.15); color: var(--accent-rose); border: 1px solid rgba(251, 113, 133, 0.3); }
+        .tag-orange { background: rgba(251, 146, 60, 0.15); color: var(--accent-orange); border: 1px solid rgba(251, 146, 60, 0.3); }
+
+        .slide-title {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #ffffff 40%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 22px;
+            line-height: 1.5;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            align-items: stretch;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        /* Modern Glass Card */
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 22px;
+            backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(251, 146, 60, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .glass-card .card-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .glass-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .glass-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Hero Slide */
+        .hero-slide {
+            text-align: center;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(251, 146, 60, 0.12);
+            border: 1px solid rgba(251, 146, 60, 0.3);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            color: var(--accent-orange);
+            margin-bottom: 18px;
+        }
+
+        .hero-title {
+            font-size: 52px;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 18px;
+            letter-spacing: -1px;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--accent-orange), var(--python-yellow), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 18.5px;
+            color: var(--text-secondary);
+            max-width: 820px;
+            margin: 0 auto 34px;
+            line-height: 1.6;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 26px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .hero-meta-item strong {
+            color: var(--text-primary);
+        }
+
+        /* Code Block Container */
+        .code-container {
+            background: #06090e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: var(--font-code);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d121d;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .dot-red { background: #ef4444; }
+        .dot-yellow { background: #eab308; }
+        .dot-green { background: #22c55e; }
+
+        .file-name {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            transition: var(--transition-smooth);
+        }
+
+        .copy-btn:hover {
+            color: var(--accent-orange);
+        }
+
+        .code-content {
+            padding: 16px 18px;
+            font-size: 14px;
+            line-height: 1.65;
+            color: #e2e8f0;
+            overflow-x: auto;
+            flex: 1;
+        }
+
+        .code-comment { color: #64748b; font-style: italic; }
+        .code-keyword { color: #f43f5e; font-weight: 600; }
+        .code-string { color: #4ade80; }
+        .code-function { color: #38bdf8; font-weight: 600; }
+        .code-number { color: #f59e0b; }
+        .code-builtin { color: #c084fc; }
+        .code-loop { color: #fb923c; font-weight: 700; }
+
+        /* Range Visualizer Pill Box */
+        .range-box {
+            background: #06090e;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .range-pill-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .range-pill {
+            background: rgba(251, 146, 60, 0.15);
+            border: 1px solid rgba(251, 146, 60, 0.3);
+            color: var(--accent-orange);
+            font-family: var(--font-code);
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        /* Interactive Simulator Terminal */
+        .interactive-box {
+            background: #090d16;
+            border: 1px solid rgba(251, 146, 60, 0.3);
+            border-radius: 14px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .terminal-editor {
+            background: #04060a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-family: var(--font-code);
+            font-size: 14px;
+            color: #4ade80;
+            width: 100%;
+            height: 110px;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        .terminal-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-run {
+            background: linear-gradient(135deg, #c2410c, #ea580c);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-run:hover {
+            background: linear-gradient(135deg, #fb923c, #ea580c);
+            box-shadow: 0 0 15px rgba(251, 146, 60, 0.4);
+            transform: scale(1.02);
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-preset {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-preset:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: var(--accent-orange);
+        }
+
+        .terminal-output {
+            background: #04060a;
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: var(--font-code);
+            font-size: 13.5px;
+            color: var(--python-yellow);
+            min-height: 52px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* Bottom Controls Bar */
+        footer.control-bar {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 36px;
+            border-top: 1px solid var(--border-color);
+            background: rgba(10, 13, 20, 0.85);
+            backdrop-filter: blur(12px);
+        }
+
+        .shortcuts-hint {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .key-badge {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 2px 7px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+            font-family: var(--font-code);
+            font-size: 11px;
+            margin-right: 4px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-nav {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 9px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            border-color: var(--accent-orange);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .btn-nav-primary {
+            background: linear-gradient(135deg, #ea580c, #f59e0b);
+            border-color: transparent;
+        }
+
+        .btn-nav-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #fb923c, #fbbf24);
+            box-shadow: 0 0 16px rgba(251, 146, 60, 0.4);
+        }
+
+        /* Overview Drawer Modal */
+        .overview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 8, 15, 0.88);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            display: none;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .overview-modal.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .overview-modal::-webkit-scrollbar {
+            width: 8px;
+        }
+        .overview-modal::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .overview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto 30px;
+        }
+
+        .overview-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .overview-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .overview-card:hover {
+            border-color: var(--accent-orange);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+
+        .overview-card.current {
+            border-color: var(--python-yellow);
+            background: rgba(250, 204, 21, 0.05);
+        }
+
+        .overview-card .ov-num {
+            font-size: 12px;
+            color: var(--accent-orange);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .overview-card .ov-title {
+            font-size: 14.5px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            right: 30px;
+            background: #1e293b;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-orange);
+            font-size: 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 200;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 960px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .hero-title { font-size: 34px; }
+            .slide-title { font-size: 26px; }
+            header, footer.control-bar { padding: 12px 20px; }
+            main.presentation-stage { padding: 14px 18px; }
+            .shortcuts-hint { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Grid -->
+    <div class="bg-grid"></div>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="brand">
+            <div class="brand-logo">Py</div>
+            <div class="brand-text">
+                <h1>
+                    Python Fundamentals
+                    <a href="index.html" class="lecture-nav-pill" title="Go to Lecture 1">L01</a>
+                    <a href="lecture2.html" class="lecture-nav-pill" title="Go to Lecture 2">L02</a>
+                    <a href="lecture3.html" class="lecture-nav-pill" title="Go to Lecture 3">L03</a>
+                    <span class="lecture-nav-pill active">L04 (Active)</span>
+                    <a href="lecture5.html" class="lecture-nav-pill" title="Go to Lecture 5">L05</a>
+                    <a href="lecture6.html" class="lecture-nav-pill" title="Go to Lecture 6">L06</a>
+                    <a href="lecture7.html" class="lecture-nav-pill" title="Go to Lecture 7">L07</a>
+                    <a href="lecture8.html" class="lecture-nav-pill" title="Go to Lecture 8">L08</a>
+                    <a href="lecture9.html" class="lecture-nav-pill" title="Go to Lecture 9">L09</a>
+                    <a href="lecture10.html" class="lecture-nav-pill" title="Go to Lecture 10">L10</a>
+                    <a href="lecture11.html" class="lecture-nav-pill" title="Go to Lecture 11">L11</a>
+                    <a href="lecture12.html" class="lecture-nav-pill" title="Go to Lecture 12">L12</a>
+                    <a href="lecture13.html" class="lecture-nav-pill" title="Go to Lecture 13">L13</a>
+                    <a href="lecture14.html" class="lecture-nav-pill" title="Go to Lecture 14">L14</a>
+                </h1>
+                <p>Lecture 04: Loops, Iteration &amp; Automation</p>
+            </div>
+        </div>
+
+        <div class="top-controls">
+            <div class="slide-counter" id="slideIndicator">Slide 01 / 13</div>
+            <button class="btn-icon" id="overviewBtn" title="Slide Overview (Press O)">
+                <i data-lucide="grid"></i> <span>Overview</span>
+            </button>
+            <button class="btn-icon" id="fullscreenBtn" title="Toggle Fullscreen (Press F)">
+                <i data-lucide="maximize"></i>
+            </button>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </header>
+
+    <!-- Main Presentation Stage -->
+    <main class="presentation-stage">
+
+        <!-- SLIDE 1: Title & Welcome -->
+        <section class="slide active hero-slide" data-slide="1">
+            <div class="hero-badge">
+                <i data-lucide="sparkles"></i> Class 04 • Master Class Series
+            </div>
+            <h1 class="hero-title">
+                Loops, <span class="gradient-text">Iteration</span> &amp; <br>Task Automation
+            </h1>
+            <p class="hero-desc">
+                Automate repetitive tasks and unlock the true power of programming! Master <code>while</code> loops, <code>for</code> sequences, the <code>range()</code> engine, loop control statements, and the unique Pythonic <code>for-else</code> construct.
+            </p>
+            <div class="hero-meta">
+                <div class="hero-meta-item">
+                    <i data-lucide="user"></i> <span>Instructor: <strong>Robiul Suny Emon</strong></span>
+                </div>
+                <div class="hero-meta-item">
+                    <i data-lucide="code-2"></i> <span>Version: <strong>Python 3.12+</strong></span>
+                </div>
+                <div class="hero-meta-item">
+                    <i data-lucide="clock"></i> <span>Duration: <strong>90 Mins</strong></span>
+                </div>
+                <div class="hero-meta-item">
+                    <i data-lucide="layers"></i> <span>Prerequisite: <strong>Lecture 03</strong></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: Roadmap -->
+        <section class="slide" data-slide="2">
+            <span class="slide-tag tag-orange"><i data-lucide="compass"></i> Roadmap</span>
+            <h2 class="slide-title">Lecture 04 Iteration Architecture</h2>
+            <p class="slide-subtitle">Four foundational pillars for mastering loops and automation in Python:</p>
+
+            <div class="grid-4">
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(251, 146, 60, 0.15); color: var(--accent-orange);">
+                        <i data-lucide="repeat"></i>
+                    </div>
+                    <h3>01. While Loops</h3>
+                    <p>Condition-driven iteration, loop counters, state mutation, and infinite loop safeguards.</p>
+                </div>
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(250, 204, 21, 0.15); color: var(--python-yellow);">
+                        <i data-lucide="arrow-right-left"></i>
+                    </div>
+                    <h3>02. For Loops &amp; Range</h3>
+                    <p>Traversing iterables, <code>range(start, stop, step)</code>, and string character iteration.</p>
+                </div>
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(74, 222, 128, 0.15); color: var(--accent-green);">
+                        <i data-lucide="shield-alert"></i>
+                    </div>
+                    <h3>03. Break, Continue &amp; Else</h3>
+                    <p>Early loop termination (<code>break</code>), skipping steps (<code>continue</code>), and <code>for-else</code>.</p>
+                </div>
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(56, 189, 248, 0.15); color: var(--python-blue);">
+                        <i data-lucide="layers"></i>
+                    </div>
+                    <h3>04. Enumerate &amp; Zip</h3>
+                    <p>Tracking indices cleanly with <code>enumerate()</code> and parallel looping with <code>zip()</code>.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: The while Loop -->
+        <section class="slide" data-slide="3">
+            <span class="slide-tag tag-yellow"><i data-lucide="rotate-cw"></i> While Loop</span>
+            <h2 class="slide-title">The <code>while</code> Loop: Condition-Driven Iteration</h2>
+            <p class="slide-subtitle">Executes a block of code repeatedly <strong>as long as</strong> a specific boolean condition evaluates to <code>True</code>:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">rocket_countdown.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-while')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-while"><code>count = <span class="code-number">5</span>
+
+<span class="code-keyword">while</span> count &gt; <span class="code-number">0</span>:
+    <span class="code-function">print</span>(<span class="code-string">f"T-Minus {count}... 🚀"</span>)
+    count -= <span class="code-number">1</span>  <span class="code-comment"># Critical: update condition!</span>
+
+<span class="code-function">print</span>(<span class="code-string">"🔥 Blast off into orbit!"</span>)</code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 14px;">
+                    <div>
+                        <h3 style="color: var(--python-yellow);">3 Anatomy Rules of a While Loop:</h3>
+                        <ul style="list-style: none; margin-top: 10px; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--text-secondary);">
+                            <li><strong style="color: #fff;">1. Initialization:</strong> Establish a starting state (e.g., <code>count = 5</code>).</li>
+                            <li><strong style="color: #fff;">2. Condition Check:</strong> Evaluated before every iteration (<code>count > 0</code>).</li>
+                            <li><strong style="color: var(--accent-rose);">3. State Mutation:</strong> Modify the variable inside the loop body (<code>count -= 1</code>) to prevent <strong>infinite loop freeze</strong>!</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: The for Loop & Iterables -->
+        <section class="slide" data-slide="4">
+            <span class="slide-tag tag-orange"><i data-lucide="repeat"></i> For Loop</span>
+            <h2 class="slide-title">The <code>for</code> Loop: Iterating Over Sequences</h2>
+            <p class="slide-subtitle">Unlike C/Java counter loops, Python's <code>for</code> loop is a modern <em>for-each</em> iterator that cleanly steps through any iterable collection:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">sequence_demo.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-for')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-for"><code><span class="code-comment"># 1. Iterating through characters in a String</span>
+<span class="code-keyword">for</span> char <span class="code-keyword">in</span> <span class="code-string">"PYTHON"</span>:
+    <span class="code-function">print</span>(<span class="code-string">f"Letter: {char}"</span>)
+
+<span class="code-comment"># 2. Iterating through a List collection</span>
+languages = [<span class="code-string">"Python"</span>, <span class="code-string">"SQL"</span>, <span class="code-string">"FastAPI"</span>]
+<span class="code-keyword">for</span> lang <span class="code-keyword">in</span> languages:
+    <span class="code-function">print</span>(<span class="code-string">f"Skill: {lang}"</span>)</code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <h3 style="color: var(--accent-orange);">Why Python For Loops are Clean:</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary);">
+                        There is no manual index indexing (like <code>for(int i=0; i&lt;len; i++)</code>). Python internally uses the <strong>Iterator Protocol</strong> (calling <code>iter()</code> and <code>next()</code>) under the hood, making your code readable and bug-free.
+                    </p>
+                    <div style="background: rgba(251, 146, 60, 0.08); border: 1px solid rgba(251, 146, 60, 0.2); padding: 12px; border-radius: 8px; font-size: 13.5px; color: #fff;">
+                        💡 <strong>Pythonic Philosophy:</strong> Direct iteration is safer and cleaner than index tracking.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: The range() Engine -->
+        <section class="slide" data-slide="5">
+            <span class="slide-tag tag-blue"><i data-lucide="binary"></i> Range Function</span>
+            <h2 class="slide-title">Mastering <code>range(start, stop, step)</code></h2>
+            <p class="slide-subtitle">Generates an immutable sequence of numbers on-demand with zero memory overhead:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">range_patterns.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-range')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-range"><code><span class="code-comment"># 1. Single arg: range(stop) -&gt; 0 to 4 (Exclusive!)</span>
+<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-builtin">range</span>(<span class="code-number">5</span>):
+    <span class="code-function">print</span>(i)  <span class="code-comment"># 0, 1, 2, 3, 4</span>
+
+<span class="code-comment"># 2. Two args: range(start, stop)</span>
+<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-builtin">range</span>(<span class="code-number">10</span>, <span class="code-number">15</span>):
+    <span class="code-function">print</span>(i)  <span class="code-comment"># 10, 11, 12, 13, 14</span>
+
+<span class="code-comment"># 3. Three args: range(start, stop, step)</span>
+<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-builtin">range</span>(<span class="code-number">0</span>, <span class="code-number">10</span>, <span class="code-number">2</span>):
+    <span class="code-function">print</span>(i)  <span class="code-comment"># 0, 2, 4, 6, 8 (Even numbers)</span>
+
+<span class="code-comment"># 4. Reverse countdown step</span>
+<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-builtin">range</span>(<span class="code-number">5</span>, <span class="code-number">0</span>, -<span class="code-number">1</span>):
+    <span class="code-function">print</span>(i)  <span class="code-comment"># 5, 4, 3, 2, 1</span></code></pre>
+                </div>
+
+                <div class="range-box">
+                    <h3 style="color: var(--python-blue); font-size: 16px;">🔍 Visualizing <code>range(1, 10, 2)</code>:</h3>
+                    <div class="range-pill-row">
+                        <div class="range-pill">1 (start)</div>
+                        <span style="color: var(--text-muted);">+2</span>
+                        <div class="range-pill">3</div>
+                        <span style="color: var(--text-muted);">+2</span>
+                        <div class="range-pill">5</div>
+                        <span style="color: var(--text-muted);">+2</span>
+                        <div class="range-pill">7</div>
+                        <span style="color: var(--text-muted);">+2</span>
+                        <div class="range-pill">9</div>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 8px; margin-top: 6px;">
+                        <span style="color: var(--accent-rose); font-weight: 700;">Critical Rule:</span> The <code>stop</code> argument is <strong>always non-inclusive (exclusive)</strong>. <code>range(5)</code> stops at <code>4</code>!
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: Break & Continue Statements -->
+        <section class="slide" data-slide="6">
+            <span class="slide-tag tag-rose"><i data-lucide="octagon"></i> Control Flow</span>
+            <h2 class="slide-title">Loop Control: <code>break</code> &amp; <code>continue</code></h2>
+            <p class="slide-subtitle">Alter normal loop execution on-the-fly based on runtime conditions:</p>
+
+            <div class="grid-2">
+                <div class="glass-card" style="border-top: 3px solid var(--accent-rose);">
+                    <h3 style="color: var(--accent-rose);">🛑 1. <code>break</code>: Immediate Exit</h3>
+                    <p style="font-size: 13.5px; margin: 6px 0 10px;">Completely terminates the loop immediately:</p>
+                    <div class="code-container" style="height: auto;">
+                        <pre class="code-content" style="padding: 10px 14px; font-size: 13px;"><code><span class="code-keyword">for</span> num <span class="code-keyword">in</span> <span class="code-builtin">range</span>(<span class="code-number">1</span>, <span class="code-number">10</span>):
+    <span class="code-keyword">if</span> num == <span class="code-number">5</span>:
+        <span class="code-function">print</span>(<span class="code-string">"Found 5! Aborting loop."</span>)
+        <span class="code-keyword">break</span>
+    <span class="code-function">print</span>(num)
+<span class="code-comment"># Output: 1, 2, 3, 4 (stops at 5)</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="glass-card" style="border-top: 3px solid var(--accent-green);">
+                    <h3 style="color: var(--accent-green);">⏭️ 2. <code>continue</code>: Skip to Next</h3>
+                    <p style="font-size: 13.5px; margin: 6px 0 10px;">Skips the remainder of the current iteration:</p>
+                    <div class="code-container" style="height: auto;">
+                        <pre class="code-content" style="padding: 10px 14px; font-size: 13px;"><code><span class="code-keyword">for</span> num <span class="code-keyword">in</span> <span class="code-builtin">range</span>(<span class="code-number">1</span>, <span class="code-number">6</span>):
+    <span class="code-keyword">if</span> num == <span class="code-number">3</span>:
+        <span class="code-keyword">continue</span>  <span class="code-comment"># Skip number 3</span>
+    <span class="code-function">print</span>(num)
+<span class="code-comment"># Output: 1, 2, 4, 5</span></code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: The Pythonic for-else & while-else -->
+        <section class="slide" data-slide="7">
+            <span class="slide-tag tag-purple"><i data-lucide="sparkle"></i> Unique Python Feature</span>
+            <h2 class="slide-title">The Unique <code>for...else</code> Construct</h2>
+            <p class="slide-subtitle">A special Python construct that executes only when the loop completes naturally without encountering a <code>break</code>:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">user_search.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-forelse')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-forelse"><code>target_user = <span class="code-string">"Sarah"</span>
+users = [<span class="code-string">"Alex"</span>, <span class="code-string">"David"</span>, <span class="code-string">"Elena"</span>]
+
+<span class="code-keyword">for</span> user <span class="code-keyword">in</span> users:
+    <span class="code-keyword">if</span> user == target_user:
+        <span class="code-function">print</span>(<span class="code-string">f"✅ Found {target_user}!"</span>)
+        <span class="code-keyword">break</span>
+<span class="code-keyword">else</span>:
+    <span class="code-comment"># Runs ONLY if the loop finishes without a break!</span>
+    <span class="code-function">print</span>(<span class="code-string">f"❌ {target_user} was not found in records."</span>)</code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 14px;">
+                    <div>
+                        <h3 style="color: var(--accent-purple);">Why <code>for...else</code> Eliminates Flag Variables:</h3>
+                        <p style="font-size: 14px; margin-top: 8px; color: var(--text-secondary);">
+                            In other languages like Java or C, you must create a clumsy boolean flag (e.g., <code>is_found = False</code>) to track whether an item was found.
+                        </p>
+                    </div>
+
+                    <div style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.25); padding: 12px; border-radius: 8px; font-size: 13.5px; color: #fff;">
+                        💡 Think of <code>else</code> here as: <em>"no-break occurred!"</em>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: Enumerate & Zip Helpers -->
+        <section class="slide" data-slide="8">
+            <span class="slide-tag tag-green"><i data-lucide="list-ordered"></i> Iteration Helpers</span>
+            <h2 class="slide-title">Pythonic Iteration: <code>enumerate()</code> &amp; <code>zip()</code></h2>
+            <p class="slide-subtitle">Two essential built-in tools for clean multi-variable and index-based iteration:</p>
+
+            <div class="grid-2">
+                <div class="glass-card">
+                    <h3 style="color: var(--accent-green); font-size: 16px;">1. <code>enumerate(iterable, start=0)</code></h3>
+                    <p style="font-size: 13.5px; margin: 6px 0 10px;">Yields pairs of <code>(index, item)</code> automatically:</p>
+                    <div class="code-container" style="height: auto;">
+                        <pre class="code-content" style="padding: 10px 14px; font-size: 13px;"><code>fruits = [<span class="code-string">"Apple"</span>, <span class="code-string">"Banana"</span>, <span class="code-string">"Cherry"</span>]
+
+<span class="code-keyword">for</span> idx, fruit <span class="code-keyword">in</span> <span class="code-builtin">enumerate</span>(fruits, start=<span class="code-number">1</span>):
+    <span class="code-function">print</span>(<span class="code-string">f"{idx}. {fruit}"</span>)
+<span class="code-comment"># 1. Apple | 2. Banana | 3. Cherry</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <h3 style="color: var(--python-blue); font-size: 16px;">2. <code>zip(list1, list2)</code></h3>
+                    <p style="font-size: 13.5px; margin: 6px 0 10px;">Pairs elements from two lists in parallel:</p>
+                    <div class="code-container" style="height: auto;">
+                        <pre class="code-content" style="padding: 10px 14px; font-size: 13px;"><code>names = [<span class="code-string">"Alice"</span>, <span class="code-string">"Bob"</span>, <span class="code-string">"Charlie"</span>]
+scores = [<span class="code-number">95</span>, <span class="code-number">88</span>, <span class="code-number">92</span>]
+
+<span class="code-keyword">for</span> name, score <span class="code-keyword">in</span> <span class="code-builtin">zip</span>(names, scores):
+    <span class="code-function">print</span>(<span class="code-string">f"{name}: {score} pts"</span>)</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: Interactive Live Sandbox -->
+        <section class="slide" data-slide="9">
+            <span class="slide-tag tag-orange"><i data-lucide="terminal-square"></i> Live Sandbox</span>
+            <h2 class="slide-title">Interactive Loops &amp; Automation Sandbox</h2>
+            <p class="slide-subtitle">Run and modify loops, countdowns, and mathematical generators inside the browser:</p>
+
+            <div class="interactive-box">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; color: var(--text-muted); font-family: var(--font-code);">Python 3.12 Loop Simulator</span>
+                    <div class="preset-buttons">
+                        <button class="btn-preset" onclick="loadPreset(1)">Multiplication Table</button>
+                        <button class="btn-preset" onclick="loadPreset(2)">Sum &amp; Average</button>
+                        <button class="btn-preset" onclick="loadPreset(3)">Pattern Generator</button>
+                    </div>
+                </div>
+
+                <textarea id="liveCodeInput" class="terminal-editor"># Generate a clean 5x multiplication table:
+number = 5
+for i in range(1, 11):
+    result = number * i
+    print(f"{number} x {i:02d} = {result}")</textarea>
+
+                <div class="terminal-actions">
+                    <button class="btn-run" id="runCodeBtn">
+                        <i data-lucide="play"></i> <span>Run Code</span>
+                    </button>
+                    <span style="font-size: 12px; color: var(--text-muted);">Simulated Output Console</span>
+                </div>
+
+                <div class="terminal-output" id="terminalOutput">&gt; Click "Run Code" to execute...</div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: Real-World Mini Project: Retry Engine -->
+        <section class="slide" data-slide="10">
+            <span class="slide-tag tag-blue"><i data-lucide="server"></i> Production Script</span>
+            <h2 class="slide-title">Mini-Project: Network Retry Logic Engine</h2>
+            <p class="slide-subtitle">A realistic automation script handling unreliable network API requests with maximum retry attempts:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">api_retry_bot.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-retry')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-retry"><code>max_attempts = <span class="code-number">3</span>
+current_attempt = <span class="code-number">1</span>
+
+<span class="code-keyword">while</span> current_attempt &lt;= max_attempts:
+    <span class="code-function">print</span>(<span class="code-string">f"📡 Connecting to Server... [Attempt {current_attempt}/{max_attempts}]"</span>)
+    
+    <span class="code-comment"># Simulated connection success on attempt 3</span>
+    <span class="code-keyword">if</span> current_attempt == <span class="code-number">3</span>:
+        <span class="code-function">print</span>(<span class="code-string">"✅ Connection Established! Syncing data..."</span>)
+        <span class="code-keyword">break</span>
+    <span class="code-keyword">else</span>:
+        <span class="code-function">print</span>(<span class="code-string">"⚠️ Connection timeout. Retrying..."</span>)
+    
+    current_attempt += <span class="code-number">1</span>
+<span class="code-keyword">else</span>:
+    <span class="code-function">print</span>(<span class="code-string">"❌ Fatal: Server unreachable after max attempts."</span>)</code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <h3 style="color: var(--accent-orange);">Real-World Engineering Value:</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary);">
+                        This exact looping pattern powers web scrapers, database connection pools, payment gateway webhooks, and cloud microservice communication worldwide.
+                    </p>
+                    <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); padding: 12px; border-radius: 8px; font-size: 13.5px; color: #fff;">
+                        ⚙️ Combining <code>while</code>, <code>break</code>, and <code>else</code> builds indestructible automation workflows.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 11: Common Beginner Gotchas -->
+        <section class="slide" data-slide="11">
+            <span class="slide-tag tag-rose"><i data-lucide="alert-octagon"></i> Pitfalls</span>
+            <h2 class="slide-title">4 Common Loop Gotchas &amp; Traps ⚠️</h2>
+            <p class="slide-subtitle">Watch out for these frequent mistakes when developing loop iterations in Python:</p>
+
+            <div class="grid-2">
+                <div class="glass-card" style="border-left: 4px solid var(--accent-rose);">
+                    <h3 style="color: var(--accent-rose);">❌ 1. Infinite While Loop</h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #fda4af;">
+                        i = 0<br>
+                        while i &lt; 5: print(i) # Forgot i += 1!
+                    </p>
+                    <p>Freezes the terminal! Always verify the counter increment.</p>
+                </div>
+
+                <div class="glass-card" style="border-left: 4px solid var(--python-yellow);">
+                    <h3 style="color: var(--python-yellow);">❌ 2. Off-By-One with <code>range()</code></h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #fef08a;">
+                        for i in range(1, 10): # Iterates 1 to 9!<br>
+                        Fix: range(1, 11) for 1 through 10.
+                    </p>
+                    <p>Remember <code>stop</code> is exclusive.</p>
+                </div>
+
+                <div class="glass-card" style="border-left: 4px solid var(--python-blue);">
+                    <h3 style="color: var(--python-blue);">❌ 3. Modifying List During Iteration</h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #bae6fd;">
+                        for item in my_list: my_list.remove(item)<br>
+                        Fix: Iterate over a copy: <code>for item in my_list[:]:</code>
+                    </p>
+                    <p>Modifying collections during active iteration skips elements!</p>
+                </div>
+
+                <div class="glass-card" style="border-left: 4px solid var(--accent-green);">
+                    <h3 style="color: var(--accent-green);">❌ 4. Confusing <code>break</code> vs <code>continue</code></h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #bbf7d0;">
+                        <code>break</code> kills the entire loop.<br>
+                        <code>continue</code> only skips to the next step.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 12: Hands-on Classroom Challenge -->
+        <section class="slide" data-slide="12">
+            <span class="slide-tag tag-green"><i data-lucide="award"></i> Classroom Challenge</span>
+            <h2 class="slide-title">🧪 Classroom Hands-on Challenge</h2>
+            <p class="slide-subtitle">Open VS Code and write solutions for the following two automation challenges (Time: 8 Mins):</p>
+
+            <div class="grid-2">
+                <div class="glass-card">
+                    <h3 style="color: var(--accent-green);">🔢 Task 1: "Prime Number Verifier"</h3>
+                    <p style="margin-bottom: 8px;">Create <code>prime_check.py</code> that checks if an inputted integer is Prime using a loop and <code>for...else</code>:</p>
+                    <div style="background: #06090e; padding: 10px 12px; border-radius: 8px; font-family: var(--font-code); font-size: 12.5px; color: var(--accent-green); line-height: 1.6;">
+                        Input: 17 &rarr; "17 is a Prime Number! 🌟"<br>
+                        Input: 15 &rarr; "15 is divisible by 3 (Not Prime)"
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <h3 style="color: var(--accent-orange);">🔺 Task 2: "Pattern Architect"</h3>
+                    <p style="margin-bottom: 8px;">Create <code>pyramid.py</code> using nested loops to print a staircase:</p>
+                    <div style="background: #06090e; padding: 10px 12px; border-radius: 8px; font-family: var(--font-code); font-size: 13px; color: #fde047; line-height: 1.5;">
+                        *<br>
+                        * *<br>
+                        * * *<br>
+                        * * * *<br>
+                        * * * * *
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 13: Q&A and Next Class Preview -->
+        <section class="slide hero-slide" data-slide="13">
+            <div class="hero-badge" style="border-color: rgba(251, 146, 60, 0.3); color: var(--accent-orange); background: rgba(251, 146, 60, 0.1);">
+                <i data-lucide="check"></i> Lecture 04 Completed!
+            </div>
+            <h1 class="hero-title">
+                Any <span class="gradient-text">Questions</span>?
+            </h1>
+            <p class="hero-desc">
+                Congratulations on mastering Python loops, sequence iteration, and script automation!
+            </p>
+
+            <div class="glass-card" style="max-width: 680px; text-align: left; margin: 0 auto 20px; border-color: rgba(251, 146, 60, 0.35);">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    <i data-lucide="fast-forward" style="color: var(--accent-orange);"></i>
+                    <h3 style="font-size: 17px; margin: 0;">Next Lecture Preview:</h3>
+                </div>
+                <p style="font-size: 14.5px; color: var(--text-secondary); margin-bottom: 12px;">
+                    <strong>Lecture 05:</strong> Data Structures Part 1 (Lists &amp; Tuples &mdash; Indexing, Slicing, In-place Methods, Memory Allocation &amp; List Comprehensions).
+                </p>
+                <a href="lecture5.html" class="btn-nav btn-nav-primary" style="display: inline-flex; text-decoration: none; width: fit-content; font-size: 13.5px;">
+                    Open Lecture 05 Slides <i data-lucide="arrow-right"></i>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Controls & Navigation -->
+    <footer class="control-bar">
+        <div class="shortcuts-hint">
+            <span><span class="key-badge">←</span> <span class="key-badge">→</span> Navigate</span>
+            <span><span class="key-badge">Space</span> Next</span>
+            <span><span class="key-badge">F</span> Fullscreen</span>
+            <span><span class="key-badge">O</span> Overview</span>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn-nav" id="prevBtn" disabled>
+                <i data-lucide="chevron-left"></i> Previous
+            </button>
+            <button class="btn-nav btn-nav-primary" id="nextBtn">
+                Next <i data-lucide="chevron-right"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Overview Modal Drawer -->
+    <div class="overview-modal" id="overviewModal">
+        <div class="overview-header">
+            <h2 style="font-size: 24px; font-weight: 700; color: #fff;">Lecture 04 Slides Overview</h2>
+            <button class="btn-icon" id="closeOverviewBtn">
+                <i data-lucide="x"></i> <span>Close</span>
+            </button>
+        </div>
+        <div class="overview-grid" id="overviewGrid"></div>
+    </div>
+
+    <!-- Toast Component -->
+    <div class="toast" id="toast">Code copied to clipboard!</div>
+
+    <!-- Slide Logic & Simulator Engine Script -->
+    <script>
+        let currentSlide = 1;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        const slideIndicator = document.getElementById('slideIndicator');
+        const progressBar = document.getElementById('progressBar');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const overviewBtn = document.getElementById('overviewBtn');
+        const closeOverviewBtn = document.getElementById('closeOverviewBtn');
+        const overviewModal = document.getElementById('overviewModal');
+        const overviewGrid = document.getElementById('overviewGrid');
+
+        const liveCodeInput = document.getElementById('liveCodeInput');
+        const runCodeBtn = document.getElementById('runCodeBtn');
+        const terminalOutput = document.getElementById('terminalOutput');
+        const toast = document.getElementById('toast');
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Slide Update Function
+        function updateSlide(targetIndex) {
+            if (targetIndex < 1 || targetIndex > totalSlides) return;
+
+            slides.forEach((slide, index) => {
+                const slideNum = index + 1;
+                slide.classList.remove('active', 'prev');
+                
+                if (slideNum === targetIndex) {
+                    slide.classList.add('active');
+                } else if (slideNum < targetIndex) {
+                    slide.classList.add('prev');
+                }
+            });
+
+            currentSlide = targetIndex;
+
+            // Update UI Counters & Progress
+            slideIndicator.innerText = `Slide ${String(currentSlide).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
+            const progressPercent = ((currentSlide - 1) / (totalSlides - 1)) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            // Update button states
+            prevBtn.disabled = (currentSlide === 1);
+            if (currentSlide === totalSlides) {
+                nextBtn.innerHTML = `Finish <i data-lucide="check"></i>`;
+            } else {
+                nextBtn.innerHTML = `Next <i data-lucide="chevron-right"></i>`;
+            }
+            lucide.createIcons();
+        }
+
+        // Navigation Handlers
+        prevBtn.addEventListener('click', () => updateSlide(currentSlide - 1));
+        nextBtn.addEventListener('click', () => updateSlide(currentSlide + 1));
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                e.preventDefault();
+                updateSlide(currentSlide + 1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                updateSlide(currentSlide - 1);
+            } else if (e.key.toLowerCase() === 'f') {
+                toggleFullscreen();
+            } else if (e.key.toLowerCase() === 'o') {
+                toggleOverview();
+            } else if (e.key === 'Escape') {
+                overviewModal.classList.remove('active');
+            }
+        });
+
+        // Fullscreen Toggle
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+        // Slide Overview Builder & Toggle
+        function buildOverview() {
+            overviewGrid.innerHTML = '';
+            slides.forEach((slide, idx) => {
+                const titleElem = slide.querySelector('.slide-title') || slide.querySelector('.hero-title');
+                const titleText = titleElem ? titleElem.innerText.replace(/[\n\r]+/g, ' ') : `Slide ${idx + 1}`;
+                
+                const card = document.createElement('div');
+                card.className = `overview-card ${idx + 1 === currentSlide ? 'current' : ''}`;
+                card.innerHTML = `
+                    <div class="ov-num">SLIDE ${String(idx + 1).padStart(2, '0')}</div>
+                    <div class="ov-title">${titleText.substring(0, 48)}...</div>
+                `;
+                card.addEventListener('click', () => {
+                    updateSlide(idx + 1);
+                    overviewModal.classList.remove('active');
+                });
+                overviewGrid.appendChild(card);
+            });
+        }
+
+        function toggleOverview() {
+            buildOverview();
+            overviewModal.classList.toggle('active');
+        }
+
+        overviewBtn.addEventListener('click', toggleOverview);
+        closeOverviewBtn.addEventListener('click', () => overviewModal.classList.remove('active'));
+
+        // Copy Code Snippet
+        function copyCode(elementId) {
+            const codeElem = document.getElementById(elementId);
+            if (!codeElem) return;
+            navigator.clipboard.writeText(codeElem.innerText).then(() => {
+                showToast("Code copied to clipboard!");
+            });
+        }
+
+        function showToast(msg) {
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // Live Simulated Terminal Runner Presets
+        const presets = {
+            1: `# Generate a clean 5x multiplication table:
+number = 5
+for i in range(1, 11):
+    result = number * i
+    print(f"{number} x {i:02d} = {result}")`,
+            2: `# Calculate Sum & Average of numbers:
+grades = [85, 92, 78, 90, 88]
+total = 0
+
+for g in grades:
+    total += g
+
+average = total / len(grades)
+print(f"Total Sum: {total}")
+print(f"Average Grade: {average:.2f}")`,
+            3: `# Staircase Star Pattern Generator:
+rows = 5
+for i in range(1, rows + 1):
+    print("*" * i)`
+        };
+
+        function loadPreset(num) {
+            if (presets[num]) {
+                liveCodeInput.value = presets[num];
+                showToast(`Preset ${num} loaded!`);
+            }
+        }
+
+        // Live Simulated Python Runner Engine
+        runCodeBtn.addEventListener('click', () => {
+            const rawCode = liveCodeInput.value;
+            terminalOutput.innerHTML = `<span style="color: #94a3b8;">&gt; Executing Loop Automation script...</span>`;
+            
+            setTimeout(() => {
+                try {
+                    let outputLines = [];
+                    if (rawCode.includes("multiplication table") || rawCode.includes("number = 5")) {
+                        for (let i = 1; i <= 10; i++) {
+                            outputLines.push(`5 x ${String(i).padStart(2, '0')} = ${5 * i}`);
+                        }
+                    } else if (rawCode.includes("Total Sum") || rawCode.includes("grades =")) {
+                        outputLines.push("Total Sum: 433");
+                        outputLines.push("Average Grade: 86.60");
+                    } else if (rawCode.includes("Staircase") || rawCode.includes("rows = 5")) {
+                        for (let i = 1; i <= 5; i++) {
+                            outputLines.push("*".repeat(i));
+                        }
+                    } else {
+                        outputLines.push("Loop executed successfully in 0.002s");
+                    }
+
+                    if (outputLines.length > 0) {
+                        terminalOutput.innerHTML = outputLines.map(l => `&gt; ${l}`).join('<br>');
+                    } else {
+                        terminalOutput.innerHTML = `&gt; Code executed successfully.`;
+                    }
+                } catch (e) {
+                    terminalOutput.innerHTML = `<span style="color: #ef4444;">&gt; Error: ${e.message}</span>`;
+                }
+            }, 250);
+        });
+
+        // Initialize First Slide
+        updateSlide(1);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 10: Python Object-Oriented Programming (OOP) Part 1 - Classes, Objects & Encapsulation</title>
+    <meta name="description" content="Python Fundamentals Lecture 10 Slides: Object-Oriented Programming (OOP), Classes, Objects, __init__, self, Instance vs Class Attributes, @classmethod, @staticmethod, and Encapsulation with @property.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0a0d14;
+            --bg-secondary: #111622;
+            --bg-card: rgba(22, 30, 46, 0.75);
+            --bg-card-hover: rgba(30, 41, 64, 0.9);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(168, 85, 247, 0.3);
+            
+            --python-blue: #38bdf8;
+            --python-yellow: #facc15;
+            --accent-green: #4ade80;
+            --accent-purple: #a855f7;
+            --accent-violet: #8b5cf6;
+            --accent-rose: #fb7185;
+            --accent-amber: #f59e0b;
+            --accent-cyan: #06b6d4;
+            --accent-indigo: #818cf8;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --font-main: 'Outfit', 'Inter', sans-serif;
+            --font-code: 'Fira Code', monospace;
+            
+            --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Animated Ambient Background Grid */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 18% 22%, rgba(168, 85, 247, 0.09) 0%, transparent 40%),
+                radial-gradient(circle at 82% 78%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(250, 204, 21, 0.04) 0%, transparent 50%),
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Top Header Navigation */
+        header {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 36px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(10, 13, 20, 0.85);
+            backdrop-filter: blur(12px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--python-blue));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 19px;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
+
+        .brand-text h1 {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .lecture-nav-pill {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 11.5px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: var(--transition-smooth);
+        }
+
+        .lecture-nav-pill:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            border-color: var(--accent-purple);
+        }
+
+        .lecture-nav-pill.active {
+            background: rgba(168, 85, 247, 0.2);
+            color: var(--accent-purple);
+            border-color: var(--accent-purple);
+        }
+
+        .top-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-icon:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-purple);
+            background: var(--bg-card-hover);
+            transform: translateY(-1px);
+        }
+
+        .slide-counter {
+            font-family: var(--font-code);
+            font-size: 13.5px;
+            font-weight: 600;
+            background: rgba(168, 85, 247, 0.12);
+            color: var(--accent-purple);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(168, 85, 247, 0.25);
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-purple), var(--python-blue), var(--python-yellow));
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
+        }
+
+        /* Main Presentation Viewport */
+        main.presentation-stage {
+            position: relative;
+            z-index: 10;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 40px;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            max-width: 1220px;
+            height: 100%;
+            max-height: 690px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(60px) scale(0.97);
+            transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.45s;
+            pointer-events: none;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .slide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .slide.prev {
+            transform: translateX(-60px) scale(0.97);
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Slide Component Styles */
+        .slide-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+        .tag-blue { background: rgba(56, 189, 248, 0.15); color: var(--python-blue); border: 1px solid rgba(56, 189, 248, 0.3); }
+        .tag-yellow { background: rgba(250, 204, 21, 0.15); color: var(--python-yellow); border: 1px solid rgba(250, 204, 21, 0.3); }
+        .tag-green { background: rgba(74, 222, 128, 0.15); color: var(--accent-green); border: 1px solid rgba(74, 222, 128, 0.3); }
+        .tag-purple { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+        .tag-rose { background: rgba(251, 113, 133, 0.15); color: var(--accent-rose); border: 1px solid rgba(251, 113, 133, 0.3); }
+        .tag-indigo { background: rgba(129, 140, 248, 0.15); color: var(--accent-indigo); border: 1px solid rgba(129, 140, 248, 0.3); }
+
+        .slide-title {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #ffffff 40%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 22px;
+            line-height: 1.5;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            align-items: stretch;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        /* Modern Glass Card */
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 22px;
+            backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .glass-card .card-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .glass-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .glass-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Hero Slide */
+        .hero-slide {
+            text-align: center;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(168, 85, 247, 0.12);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            color: var(--accent-purple);
+            margin-bottom: 18px;
+        }
+
+        .hero-title {
+            font-size: 52px;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 18px;
+            letter-spacing: -1px;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--accent-purple), var(--python-blue), var(--python-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 18.5px;
+            color: var(--text-secondary);
+            max-width: 820px;
+            margin: 0 auto 34px;
+            line-height: 1.6;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 26px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .hero-meta-item strong {
+            color: var(--text-primary);
+        }
+
+        /* Code Block Container */
+        .code-container {
+            background: #06090e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: var(--font-code);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d121d;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .dot-red { background: #ef4444; }
+        .dot-yellow { background: #eab308; }
+        .dot-green { background: #22c55e; }
+
+        .file-name {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            transition: var(--transition-smooth);
+        }
+
+        .copy-btn:hover {
+            color: var(--accent-purple);
+        }
+
+        .code-content {
+            padding: 16px 18px;
+            font-size: 14px;
+            line-height: 1.65;
+            color: #e2e8f0;
+            overflow-x: auto;
+            flex: 1;
+        }
+
+        .code-comment { color: #64748b; font-style: italic; }
+        .code-keyword { color: #f43f5e; font-weight: 600; }
+        .code-string { color: #4ade80; }
+        .code-function { color: #38bdf8; font-weight: 600; }
+        .code-number { color: #f59e0b; }
+        .code-builtin { color: #c084fc; }
+
+        /* Interactive Simulator Terminal */
+        .interactive-box {
+            background: #090d16;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 14px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .terminal-editor {
+            background: #04060a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-family: var(--font-code);
+            font-size: 14px;
+            color: #4ade80;
+            width: 100%;
+            height: 110px;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        .terminal-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-run {
+            background: linear-gradient(135deg, #7c3aed, #0284c7);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-run:hover {
+            background: linear-gradient(135deg, #a855f7, #38bdf8);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+            transform: scale(1.02);
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-preset {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-preset:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: var(--accent-purple);
+        }
+
+        .terminal-output {
+            background: #04060a;
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: var(--font-code);
+            font-size: 13.5px;
+            color: var(--python-yellow);
+            min-height: 52px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* Bottom Controls Bar */
+        footer.control-bar {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 36px;
+            border-top: 1px solid var(--border-color);
+            background: rgba(10, 13, 20, 0.85);
+            backdrop-filter: blur(12px);
+        }
+
+        .shortcuts-hint {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .key-badge {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 2px 7px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+            font-family: var(--font-code);
+            font-size: 11px;
+            margin-right: 4px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-nav {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 9px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            border-color: var(--accent-purple);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .btn-nav-primary {
+            background: linear-gradient(135deg, #7c3aed, #0284c7);
+            border-color: transparent;
+        }
+
+        .btn-nav-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #a855f7, #38bdf8);
+            box-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
+        }
+
+        /* Overview Drawer Modal */
+        .overview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 8, 15, 0.88);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            display: none;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .overview-modal.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .overview-modal::-webkit-scrollbar {
+            width: 8px;
+        }
+        .overview-modal::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .overview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto 30px;
+        }
+
+        .overview-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .overview-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .overview-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+
+        .overview-card.current {
+            border-color: var(--python-yellow);
+            background: rgba(250, 204, 21, 0.05);
+        }
+
+        .overview-card .ov-num {
+            font-size: 12px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .overview-card .ov-title {
+            font-size: 14.5px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            right: 30px;
+            background: #1e293b;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-purple);
+            font-size: 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 200;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 960px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .hero-title { font-size: 34px; }
+            .slide-title { font-size: 26px; }
+            header, footer.control-bar { padding: 12px 20px; }
+            main.presentation-stage { padding: 14px 18px; }
+            .shortcuts-hint { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Grid -->
+    <div class="bg-grid"></div>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="brand">
+            <div class="brand-logo">Py</div>
+            <div class="brand-text">
+                <h1>
+                    Python Fundamentals
+                    <a href="index.html" class="lecture-nav-pill" title="Go to Lecture 1">L01</a>
+                    <a href="lecture2.html" class="lecture-nav-pill" title="Go to Lecture 2">L02</a>
+                    <a href="lecture3.html" class="lecture-nav-pill" title="Go to Lecture 3">L03</a>
+                    <a href="lecture4.html" class="lecture-nav-pill" title="Go to Lecture 4">L04</a>
+                    <a href="lecture5.html" class="lecture-nav-pill" title="Go to Lecture 5">L05</a>
+                    <a href="lecture6.html" class="lecture-nav-pill" title="Go to Lecture 6">L06</a>
+                    <a href="lecture7.html" class="lecture-nav-pill" title="Go to Lecture 7">L07</a>
+                    <a href="lecture8.html" class="lecture-nav-pill" title="Go to Lecture 8">L08</a>
+                    <a href="lecture9.html" class="lecture-nav-pill" title="Go to Lecture 9">L09</a>
+                    <span class="lecture-nav-pill active">L10 (Active)</span>
+                    <a href="lecture11.html" class="lecture-nav-pill" title="Go to Lecture 11">L11</a>
+                    <a href="lecture12.html" class="lecture-nav-pill" title="Go to Lecture 12">L12</a>
+                    <a href="lecture13.html" class="lecture-nav-pill" title="Go to Lecture 13">L13</a>
+                    <a href="lecture14.html" class="lecture-nav-pill" title="Go to Lecture 14">L14</a>
+                </h1>
+                <p>Lecture 10: Object-Oriented Programming (OOP) Part 1</p>
+            </div>
+        </div>
+
+        <div class="top-controls">
+            <div class="slide-counter" id="slideIndicator">Slide 01 / 13</div>
+            <button class="btn-icon" id="overviewBtn" title="Slide Overview (Press O)">
+                <i data-lucide="grid"></i> <span>Overview</span>
+            </button>
+            <button class="btn-icon" id="fullscreenBtn" title="Toggle Fullscreen (Press F)">
+                <i data-lucide="maximize"></i>
+            </button>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </header>
+
+    <!-- Main Presentation Stage -->
+    <main class="presentation-stage">
+
+        <!-- SLIDE 1: Title & Welcome -->
+        <section class="slide active hero-slide" data-slide="1">
+            <div class="hero-badge">
+                <i data-lucide="sparkles"></i> Class 10 • Master Class Series
+            </div>
+            <h1 class="hero-title">
+                Object-Oriented Programming: <br><span class="gradient-text">Classes, Objects &amp; Encapsulation</span>
+            </h1>
+            <p class="hero-desc">
+                Model real-world enterprise entities with elegant software blueprints! Master <code>class</code> definitions, the <code>__init__</code> constructor, the <code>self</code> pointer, instance vs class attributes, <code>@classmethod</code>, <code>@staticmethod</code>, and data protection with <code>@property</code>.
+            </p>
+            <div class="hero-meta">
+                <div class="hero-meta-item">
+                    <i data-lucide="user"></i> <span>Instructor: <strong>Robiul Suny Emon</strong></span>
+                </div>
+                <div class="hero-meta-item">
+                    <i data-lucide="code-2"></i> <span>Version: <strong>Python 3.12+</strong></span>
+                </div>
+                <div class="hero-meta-item">
+                    <i data-lucide="clock"></i> <span>Duration: <strong>90 Mins</strong></span>
+                </div>
+                <div class="hero-meta-item">
+                    <i data-lucide="layers"></i> <span>Prerequisite: <strong>Lecture 09</strong></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: Roadmap -->
+        <section class="slide" data-slide="2">
+            <span class="slide-tag tag-purple"><i data-lucide="compass"></i> Roadmap</span>
+            <h2 class="slide-title">Lecture 10 OOP Architecture</h2>
+            <p class="slide-subtitle">Four foundational pillars for object-oriented software engineering:</p>
+
+            <div class="grid-4">
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(168, 85, 247, 0.15); color: var(--accent-purple);">
+                        <i data-lucide="box"></i>
+                    </div>
+                    <h3>01. Classes &amp; self</h3>
+                    <p>Class blueprints, object instantiation, <code>__init__</code>, and instance state.</p>
+                </div>
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(56, 189, 248, 0.15); color: var(--python-blue);">
+                        <i data-lucide="layers"></i>
+                    </div>
+                    <h3>02. Attributes &amp; Scope</h3>
+                    <p>Instance attributes vs. shared Class attributes &amp; memory allocations.</p>
+                </div>
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(250, 204, 21, 0.15); color: var(--python-yellow);">
+                        <i data-lucide="sparkles"></i>
+                    </div>
+                    <h3>03. Method Decorators</h3>
+                    <p>Instance methods, <code>@classmethod</code> factories, and <code>@staticmethod</code> utilities.</p>
+                </div>
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(74, 222, 128, 0.15); color: var(--accent-green);">
+                        <i data-lucide="shield-check"></i>
+                    </div>
+                    <h3>04. Encapsulation</h3>
+                    <p>Private mangling (<code>__var</code>), <code>@property</code> getters &amp; setters.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: Classes, Objects & __init__ -->
+        <section class="slide" data-slide="3">
+            <span class="slide-tag tag-purple"><i data-lucide="cpu"></i> Foundation</span>
+            <h2 class="slide-title">Classes, Instances &amp; The <code>__init__</code> Constructor</h2>
+            <p class="slide-subtitle">A class is the architectural blueprint; an object is a live instance residing in memory:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">bank_account.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-oop-init')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-oop-init"><code><span class="code-keyword">class</span> <span class="code-function">BankAccount</span>:
+    <span class="code-comment"># Constructor: Called automatically upon creation</span>
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, owner: <span class="code-builtin">str</span>, balance: <span class="code-builtin">float</span> = <span class="code-number">0.0</span>):
+        self.owner = owner          <span class="code-comment"># Instance attribute</span>
+        self.balance = balance      <span class="code-comment"># Instance attribute</span>
+
+    <span class="code-keyword">def</span> <span class="code-function">deposit</span>(self, amount: <span class="code-builtin">float</span>):
+        self.balance += amount
+        <span class="code-function">print</span>(<span class="code-string">f"[{self.owner}] Deposited ${amount}. New Balance: ${self.balance}"</span>)
+
+<span class="code-comment"># Instantiating distinct objects in memory</span>
+acc1 = BankAccount(<span class="code-string">"Robiul"</span>, <span class="code-number">1000.0</span>)
+acc2 = BankAccount(<span class="code-string">"Ayesha"</span>, <span class="code-number">500.0</span>)
+
+acc1.deposit(<span class="code-number">250</span>)  <span class="code-comment"># Only affects acc1's balance!</span></code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <h3 style="color: var(--accent-purple);">What is <code>self</code>?</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary);">
+                        <code>self</code> is Python's explicit pointer to the specific object instance invoking the method. When you write <code>acc1.deposit(250)</code>, Python internally executes <code>BankAccount.deposit(acc1, 250)</code>!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: Instance vs Class Attributes -->
+        <section class="slide" data-slide="4">
+            <span class="slide-tag tag-blue"><i data-lucide="layers"></i> State Architecture</span>
+            <h2 class="slide-title">Instance Attributes vs. Class Attributes</h2>
+            <p class="slide-subtitle">Understand where state lives: unique per object vs. shared across all instances:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">attributes_demo.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-attr')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-attr"><code><span class="code-keyword">class</span> <span class="code-function">Employee</span>:
+    <span class="code-comment"># Class Attribute (Shared across EVERY instance)</span>
+    company_name = <span class="code-string">"TechNova Corp"</span>
+    total_employees = <span class="code-number">0</span>
+
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, name: <span class="code-builtin">str</span>, role: <span class="code-builtin">str</span>):
+        self.name = name        <span class="code-comment"># Instance attribute</span>
+        self.role = role        <span class="code-comment"># Instance attribute</span>
+        Employee.total_employees += <span class="code-number">1</span>
+
+e1 = Employee(<span class="code-string">"Robiul"</span>, <span class="code-string">"AI Lead"</span>)
+e2 = Employee(<span class="code-string">"Tanvir"</span>, <span class="code-string">"DevOps"</span>)
+
+<span class="code-function">print</span>(e1.company_name)            <span class="code-comment"># "TechNova Corp"</span>
+<span class="code-function">print</span>(Employee.total_employees)  <span class="code-comment"># 2</span></code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <h3 style="color: var(--python-blue);">Comparison Matrix:</h3>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 13.5px; color: var(--text-secondary);">
+                        <li><strong style="color: #fff;">Instance Attribute (<code>self.x</code>):</strong> Defined inside <code>__init__</code>. Each object has its own isolated copy.</li>
+                        <li><strong style="color: var(--python-yellow);">Class Attribute (<code>ClassName.x</code>):</strong> Defined directly inside class body. Stored in class namespace, shared by all.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: Method Types: Instance, Class & Static Methods -->
+        <section class="slide" data-slide="5">
+            <span class="slide-tag tag-yellow"><i data-lucide="sparkles"></i> Method Decorators</span>
+            <h2 class="slide-title">Method Types: <code>self</code>, <code>@classmethod</code> &amp; <code>@staticmethod</code></h2>
+            <p class="slide-subtitle">Choose the exact method signature based on the level of state access required:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">method_types.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-methods')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-methods"><code><span class="code-keyword">class</span> <span class="code-function">User</span>:
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, name: <span class="code-builtin">str</span>, age: <span class="code-builtin">int</span>):
+        self.name = name
+        self.age = age
+
+    <span class="code-comment"># 1. Instance Method (Accesses self)</span>
+    <span class="code-keyword">def</span> <span class="code-function">greet</span>(self):
+        <span class="code-keyword">return</span> <span class="code-string">f"Hello, I am {self.name}."</span>
+
+    <span class="code-comment"># 2. Class Method (Factory Constructor using cls)</span>
+    <span class="code-keyword">@classmethod</span>
+    <span class="code-keyword">def</span> <span class="code-function">from_birth_year</span>(cls, name: <span class="code-builtin">str</span>, birth_year: <span class="code-builtin">int</span>):
+        age = <span class="code-number">2026</span> - birth_year
+        <span class="code-keyword">return</span> cls(name, age)
+
+    <span class="code-comment"># 3. Static Method (Utility function, zero state access)</span>
+    <span class="code-keyword">@staticmethod</span>
+    <span class="code-keyword">def</span> <span class="code-function">is_adult</span>(age: <span class="code-builtin">int</span>) -&gt; <span class="code-builtin">bool</span>:
+        <span class="code-keyword">return</span> age &gt;= <span class="code-number">18</span></code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <h3 style="color: var(--python-yellow);">When to Use Each:</h3>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; color: var(--text-secondary);">
+                        <li><strong style="color: #fff;">Instance:</strong> Modifying individual object properties.</li>
+                        <li><strong style="color: var(--accent-purple);">@classmethod:</strong> Alternative constructors (e.g. <code>User.from_json()</code>).</li>
+                        <li><strong style="color: var(--accent-green);">@staticmethod:</strong> Helper logic logically grouped with the class.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: Encapsulation & Properties -->
+        <section class="slide" data-slide="6">
+            <span class="slide-tag tag-green"><i data-lucide="shield-check"></i> Data Security</span>
+            <h2 class="slide-title">Encapsulation: <code>@property</code> &amp; Private Attributes</h2>
+            <p class="slide-subtitle">Protect internal state from invalid external mutations with clean Pythonic getters and setters:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">secure_wallet.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-prop')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-prop"><code><span class="code-keyword">class</span> <span class="code-function">SmartWallet</span>:
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, initial_amount: <span class="code-builtin">float</span>):
+        self.__balance = initial_amount  <span class="code-comment"># Private (Mangled!)</span>
+
+    <span class="code-comment"># Getter Decorator</span>
+    <span class="code-keyword">@property</span>
+    <span class="code-keyword">def</span> <span class="code-function">balance</span>(self) -&gt; <span class="code-builtin">float</span>:
+        <span class="code-keyword">return</span> self.__balance
+
+    <span class="code-comment"># Setter Decorator with Validation</span>
+    <span class="code-keyword">@balance.setter</span>
+    <span class="code-keyword">def</span> <span class="code-function">balance</span>(self, value: <span class="code-builtin">float</span>):
+        <span class="code-keyword">if</span> value &lt; <span class="code-number">0</span>:
+            <span class="code-keyword">raise</span> <span class="code-builtin">ValueError</span>(<span class="code-string">"Balance cannot be negative!"</span>)
+        self.__balance = value
+
+wallet = SmartWallet(<span class="code-number">100.0</span>)
+wallet.balance = <span class="code-number">250.0</span>  <span class="code-comment"># Clean syntax triggers setter validation!</span></code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <h3 style="color: var(--accent-green);">Python Access Modifiers:</h3>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; color: var(--text-secondary);">
+                        <li><code>self.name</code>: Public (Accessible anywhere)</li>
+                        <li><code>self._name</code>: Protected convention (Internal hint)</li>
+                        <li><code>self.__name</code>: Private (Name mangled to <code>_Class__name</code>)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: Common Pitfalls & Traps -->
+        <section class="slide" data-slide="7">
+            <span class="slide-tag tag-rose"><i data-lucide="alert-triangle"></i> Pitfalls</span>
+            <h2 class="slide-title">4 Common Beginner OOP Traps ⚠️</h2>
+            <p class="slide-subtitle">Watch out for these four frequent object-oriented bugs:</p>
+
+            <div class="grid-2">
+                <div class="glass-card" style="border-left: 4px solid var(--accent-rose);">
+                    <h3 style="color: var(--accent-rose);">❌ 1. Forgetting self in Method</h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #fda4af;">
+                        def my_method(): pass<br>
+                        TypeError: takes 0 positional arguments but 1 given!
+                    </p>
+                </div>
+
+                <div class="glass-card" style="border-left: 4px solid var(--python-yellow);">
+                    <h3 style="color: var(--python-yellow);">❌ 2. Mutating Class Attribute on Object</h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #fef08a;">
+                        obj.shared_list.append(x) # Modifies for ALL objects!<br>
+                        Fix: Initialize mutable lists inside __init__.
+                    </p>
+                </div>
+
+                <div class="glass-card" style="border-left: 4px solid var(--python-blue);">
+                    <h3 style="color: var(--python-blue);">❌ 3. Direct Private Access Crash</h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #bae6fd;">
+                        print(obj.__secret) # AttributeError!<br>
+                        Fix: Use @property getter.
+                    </p>
+                </div>
+
+                <div class="glass-card" style="border-left: 4px solid var(--accent-purple);">
+                    <h3 style="color: var(--accent-purple);">❌ 4. Missing @classmethod Decorator</h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #e9d5ff;">
+                        Calling cls method without @classmethod treats first arg as instance!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: Interactive Live Sandbox -->
+        <section class="slide" data-slide="8">
+            <span class="slide-tag tag-purple"><i data-lucide="terminal-square"></i> Live Sandbox</span>
+            <h2 class="slide-title">Interactive OOP &amp; Class Sandbox</h2>
+            <p class="slide-subtitle">Instantiate live Python classes, trigger methods, and test getters in real-time:</p>
+
+            <div class="interactive-box">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; color: var(--text-muted); font-family: var(--font-code);">Python 3.12 OOP Engine</span>
+                    <div class="preset-buttons">
+                        <button class="btn-preset" onclick="loadPreset(1)">Bank Vault</button>
+                        <button class="btn-preset" onclick="loadPreset(2)">Factory Cls</button>
+                        <button class="btn-preset" onclick="loadPreset(3)">Property Setter</button>
+                    </div>
+                </div>
+
+                <textarea id="liveCodeInput" class="terminal-editor"># Enterprise Bank Account Simulator:
+class Account:
+    bank_name = "Global Trust"
+
+    def __init__(self, owner, balance):
+        self.owner = owner
+        self.balance = balance
+
+    def deposit(self, amt):
+        self.balance += amt
+        return f"Deposited ${amt} | New Balance: ${self.balance}"
+
+acc = Account("Robiul Suny", 1500)
+print(f"Bank: {Account.bank_name} | Owner: {acc.owner}")
+print(acc.deposit(500))</textarea>
+
+                <div class="terminal-actions">
+                    <button class="btn-run" id="runCodeBtn">
+                        <i data-lucide="play"></i> <span>Run Code</span>
+                    </button>
+                    <span style="font-size: 12px; color: var(--text-muted);">Simulated Output Console</span>
+                </div>
+
+                <div class="terminal-output" id="terminalOutput">&gt; Click "Run Code" to execute...</div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: Real-World Mini Project: Banking Security Vault -->
+        <section class="slide" data-slide="9">
+            <span class="slide-tag tag-blue"><i data-lucide="shield-alert"></i> Production Engine</span>
+            <h2 class="slide-title">Mini-Project: Secure Bank Account Vault</h2>
+            <p class="slide-subtitle">An enterprise banking account class encapsulating balance, audit trails, and PIN validation:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">secure_account.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-vault')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-vault"><code><span class="code-keyword">class</span> <span class="code-function">SecureAccount</span>:
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, owner: <span class="code-builtin">str</span>, initial_balance: <span class="code-builtin">float</span>, pin: <span class="code-builtin">str</span>):
+        self.owner = owner
+        self.__balance = initial_balance
+        self.__pin = pin
+
+    <span class="code-keyword">def</span> <span class="code-function">withdraw</span>(self, amount: <span class="code-builtin">float</span>, pin: <span class="code-builtin">str</span>) -&gt; <span class="code-builtin">float</span>:
+        <span class="code-keyword">if</span> pin != self.__pin:
+            <span class="code-keyword">raise</span> <span class="code-builtin">PermissionError</span>(<span class="code-string">"Invalid Security PIN!"</span>)
+        <span class="code-keyword">if</span> amount &gt; self.__balance:
+            <span class="code-keyword">raise</span> <span class="code-builtin">ValueError</span>(<span class="code-string">"Insufficient account balance."</span>)
+        self.__balance -= amount
+        <span class="code-keyword">return</span> self.__balance
+
+acc = SecureAccount(<span class="code-string">"Robiul"</span>, <span class="code-number">5000.0</span>, <span class="code-string">"1234"</span>)
+remaining = acc.withdraw(<span class="code-number">1000.0</span>, <span class="code-string">"1234"</span>)
+<span class="code-function">print</span>(<span class="code-string">f"Remaining Funds: ${remaining}"</span>)</code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <h3 style="color: var(--accent-purple);">Encapsulation in Action:</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary);">
+                        External code cannot tamper with <code>acc.__balance</code> directly. Every state modification must pass through the verified business logic gates inside <code>withdraw()</code>!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: Classroom Challenge -->
+        <section class="slide" data-slide="10">
+            <span class="slide-tag tag-green"><i data-lucide="award"></i> Classroom Challenge</span>
+            <h2 class="slide-title">🧪 Classroom Hands-on Challenge</h2>
+            <p class="slide-subtitle">Open VS Code and write solutions for the following two OOP challenges (Time: 8 Mins):</p>
+
+            <div class="grid-2">
+                <div class="glass-card">
+                    <h3 style="color: var(--accent-purple);">🛒 Task 1: "Product Inventory with @property"</h3>
+                    <p style="margin-bottom: 8px;">Create <code>Product</code> class with name and price:</p>
+                    <div style="background: #06090e; padding: 10px 12px; border-radius: 8px; font-family: var(--font-code); font-size: 12.5px; color: var(--accent-green); line-height: 1.6;">
+                        - Private <code>__price</code><br>
+                        - <code>@property</code> getter for price<br>
+                        - <code>@price.setter</code> rejecting prices &lt;= 0 with ValueError
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <h3 style="color: var(--python-yellow);">🚗 Task 2: "Fleet Manager with @classmethod"</h3>
+                    <p style="margin-bottom: 8px;">Create <code>Vehicle</code> class tracking total fleet size:</p>
+                    <div style="background: #06090e; padding: 10px 12px; border-radius: 8px; font-family: var(--font-code); font-size: 12.5px; color: #fde047; line-height: 1.5;">
+                        - Class attribute <code>fleet_count = 0</code><br>
+                        - Increments on each instantiation<br>
+                        - <code>@classmethod</code> factory: <code>from_string("Tesla,Model3,2024")</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 11: Q&A and Next Class Preview -->
+        <section class="slide hero-slide" data-slide="11">
+            <div class="hero-badge" style="border-color: rgba(168, 85, 247, 0.3); color: var(--accent-purple); background: rgba(168, 85, 247, 0.1);">
+                <i data-lucide="check"></i> Lecture 10 Completed!
+            </div>
+            <h1 class="hero-title">
+                Any <span class="gradient-text">Questions</span>?
+            </h1>
+            <p class="hero-desc">
+                Congratulations on mastering Python Object-Oriented Programming, Constructors, Method Types, and Encapsulation!
+            </p>
+
+            <div class="glass-card" style="max-width: 680px; text-align: left; margin: 0 auto 20px; border-color: rgba(168, 85, 247, 0.35);">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    <i data-lucide="fast-forward" style="color: var(--accent-purple);"></i>
+                    <h3 style="font-size: 17px; margin: 0;">Next Lecture Preview:</h3>
+                </div>
+                <p style="font-size: 14.5px; color: var(--text-secondary); margin-bottom: 12px;">
+                    <strong>Lecture 11:</strong> Advanced OOP &mdash; Inheritance, Polymorphism, <code>super()</code>, Abstract Base Classes (ABC), and Magic / Dunder Methods (<code>__str__</code>, <code>__repr__</code>, <code>__len__</code>, <code>__eq__</code>).
+                </p>
+                <a href="lecture11.html" class="btn-nav btn-nav-primary" style="display: inline-flex; text-decoration: none; width: fit-content; font-size: 13.5px;">
+                    Open Lecture 11 Slides <i data-lucide="arrow-right"></i>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Controls & Navigation -->
+    <footer class="control-bar">
+        <div class="shortcuts-hint">
+            <span><span class="key-badge">←</span> <span class="key-badge">→</span> Navigate</span>
+            <span><span class="key-badge">Space</span> Next</span>
+            <span><span class="key-badge">F</span> Fullscreen</span>
+            <span><span class="key-badge">O</span> Overview</span>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn-nav" id="prevBtn" disabled>
+                <i data-lucide="chevron-left"></i> Previous
+            </button>
+            <button class="btn-nav btn-nav-primary" id="nextBtn">
+                Next <i data-lucide="chevron-right"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Overview Modal Drawer -->
+    <div class="overview-modal" id="overviewModal">
+        <div class="overview-header">
+            <h2 style="font-size: 24px; font-weight: 700; color: #fff;">Lecture 10 Slides Overview</h2>
+            <button class="btn-icon" id="closeOverviewBtn">
+                <i data-lucide="x"></i> <span>Close</span>
+            </button>
+        </div>
+        <div class="overview-grid" id="overviewGrid"></div>
+    </div>
+
+    <!-- Toast Component -->
+    <div class="toast" id="toast">Code copied to clipboard!</div>
+
+    <!-- Slide Logic & Simulator Engine Script -->
+    <script>
+        let currentSlide = 1;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        const slideIndicator = document.getElementById('slideIndicator');
+        const progressBar = document.getElementById('progressBar');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const overviewBtn = document.getElementById('overviewBtn');
+        const closeOverviewBtn = document.getElementById('closeOverviewBtn');
+        const overviewModal = document.getElementById('overviewModal');
+        const overviewGrid = document.getElementById('overviewGrid');
+
+        const liveCodeInput = document.getElementById('liveCodeInput');
+        const runCodeBtn = document.getElementById('runCodeBtn');
+        const terminalOutput = document.getElementById('terminalOutput');
+        const toast = document.getElementById('toast');
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Slide Update Function
+        function updateSlide(targetIndex) {
+            if (targetIndex < 1 || targetIndex > totalSlides) return;
+
+            slides.forEach((slide, index) => {
+                const slideNum = index + 1;
+                slide.classList.remove('active', 'prev');
+                
+                if (slideNum === targetIndex) {
+                    slide.classList.add('active');
+                } else if (slideNum < targetIndex) {
+                    slide.classList.add('prev');
+                }
+            });
+
+            currentSlide = targetIndex;
+
+            // Update UI Counters & Progress
+            slideIndicator.innerText = `Slide ${String(currentSlide).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
+            const progressPercent = ((currentSlide - 1) / (totalSlides - 1)) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            // Update button states
+            prevBtn.disabled = (currentSlide === 1);
+            if (currentSlide === totalSlides) {
+                nextBtn.innerHTML = `Finish <i data-lucide="check"></i>`;
+            } else {
+                nextBtn.innerHTML = `Next <i data-lucide="chevron-right"></i>`;
+            }
+            lucide.createIcons();
+        }
+
+        // Navigation Handlers
+        prevBtn.addEventListener('click', () => updateSlide(currentSlide - 1));
+        nextBtn.addEventListener('click', () => updateSlide(currentSlide + 1));
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                e.preventDefault();
+                updateSlide(currentSlide + 1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                updateSlide(currentSlide - 1);
+            } else if (e.key.toLowerCase() === 'f') {
+                toggleFullscreen();
+            } else if (e.key.toLowerCase() === 'o') {
+                toggleOverview();
+            } else if (e.key === 'Escape') {
+                overviewModal.classList.remove('active');
+            }
+        });
+
+        // Fullscreen Toggle
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+        // Slide Overview Builder & Toggle
+        function buildOverview() {
+            overviewGrid.innerHTML = '';
+            slides.forEach((slide, idx) => {
+                const titleElem = slide.querySelector('.slide-title') || slide.querySelector('.hero-title');
+                const titleText = titleElem ? titleElem.innerText.replace(/[\n\r]+/g, ' ') : `Slide ${idx + 1}`;
+                
+                const card = document.createElement('div');
+                card.className = `overview-card ${idx + 1 === currentSlide ? 'current' : ''}`;
+                card.innerHTML = `
+                    <div class="ov-num">SLIDE ${String(idx + 1).padStart(2, '0')}</div>
+                    <div class="ov-title">${titleText.substring(0, 48)}...</div>
+                `;
+                card.addEventListener('click', () => {
+                    updateSlide(idx + 1);
+                    overviewModal.classList.remove('active');
+                });
+                overviewGrid.appendChild(card);
+            });
+        }
+
+        function toggleOverview() {
+            buildOverview();
+            overviewModal.classList.toggle('active');
+        }
+
+        overviewBtn.addEventListener('click', toggleOverview);
+        closeOverviewBtn.addEventListener('click', () => overviewModal.classList.remove('active'));
+
+        // Copy Code Snippet
+        function copyCode(elementId) {
+            const codeElem = document.getElementById(elementId);
+            if (!codeElem) return;
+            navigator.clipboard.writeText(codeElem.innerText).then(() => {
+                showToast("Code copied to clipboard!");
+            });
+        }
+
+        function showToast(msg) {
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // Live Simulated Terminal Runner Presets
+        const presets = {
+            1: `# Enterprise Bank Account Simulator:
+class Account:
+    bank_name = "Global Trust"
+
+    def __init__(self, owner, balance):
+        self.owner = owner
+        self.balance = balance
+
+    def deposit(self, amt):
+        self.balance += amt
+        return f"Deposited ${amt} | New Balance: ${self.balance}"
+
+acc = Account("Robiul Suny", 1500)
+print(f"Bank: {Account.bank_name} | Owner: {acc.owner}")
+print(acc.deposit(500))`,
+            2: `# ClassMethod Factory Constructor:
+class User:
+    def __init__(self, username, role):
+        self.username = username
+        self.role = role
+
+    @classmethod
+    def admin_user(cls, username):
+        return cls(username, "SuperAdmin")
+
+u = User.admin_user("robiul_emon")
+print(f"User: {u.username} | Role: {u.role}")`,
+            3: `# Property Validation Getter/Setter:
+class Temperature:
+    def __init__(self, celsius):
+        self._celsius = celsius
+
+    @property
+    def fahrenheit(self):
+        return (self._celsius * 9/5) + 32
+
+t = Temperature(25)
+print(f"25°C in Fahrenheit: {t.fahrenheit}°F")`
+        };
+
+        function loadPreset(num) {
+            if (presets[num]) {
+                liveCodeInput.value = presets[num];
+                showToast(`Preset ${num} loaded!`);
+            }
+        }
+
+        // Live Simulated Python Runner Engine
+        runCodeBtn.addEventListener('click', () => {
+            const rawCode = liveCodeInput.value;
+            terminalOutput.innerHTML = `<span style="color: #94a3b8;">&gt; Instantiating Python OOP Engine...</span>`;
+            
+            setTimeout(() => {
+                try {
+                    let outputLines = [];
+                    if (rawCode.includes("Global Trust") || rawCode.includes("deposit")) {
+                        outputLines.push("Bank: Global Trust | Owner: Robiul Suny");
+                        outputLines.push("Deposited $500 | New Balance: $2000");
+                    } else if (rawCode.includes("admin_user") || rawCode.includes("SuperAdmin")) {
+                        outputLines.push("User: robiul_emon | Role: SuperAdmin");
+                    } else if (rawCode.includes("Temperature") || rawCode.includes("fahrenheit")) {
+                        outputLines.push("25°C in Fahrenheit: 77.0°F");
+                    } else {
+                        outputLines.push("Object instantiated and methods executed.");
+                    }
+
+                    if (outputLines.length > 0) {
+                        terminalOutput.innerHTML = outputLines.map(l => `&gt; ${l}`).join('<br>');
+                    } else {
+                        terminalOutput.innerHTML = `&gt; Code executed successfully.`;
+                    }
+                } catch (e) {
+                    terminalOutput.innerHTML = `<span style="color: #ef4444;">&gt; Error: ${e.message}</span>`;
+                }
+            }, 250);
+        });
+
+        // Initialize First Slide
+        updateSlide(1);
+    </script>
+</body>
+</html>
