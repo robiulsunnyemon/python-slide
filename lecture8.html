@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 08: Python File I/O, Context Managers & Exception Handling</title>
+    <meta name="description" content="Python Fundamentals Lecture 08 Slides: File I/O, with open(), Context Managers, try/except/else/finally, Custom Exceptions, JSON and CSV handling.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0a0d14;
+            --bg-secondary: #111622;
+            --bg-card: rgba(22, 30, 46, 0.75);
+            --bg-card-hover: rgba(30, 41, 64, 0.9);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(251, 113, 133, 0.3);
+            
+            --python-blue: #38bdf8;
+            --python-yellow: #facc15;
+            --accent-green: #4ade80;
+            --accent-purple: #a855f7;
+            --accent-rose: #fb7185;
+            --accent-amber: #f59e0b;
+            --accent-orange: #fb923c;
+            --accent-cyan: #22d3ee;
+            --accent-indigo: #818cf8;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --font-main: 'Outfit', 'Inter', sans-serif;
+            --font-code: 'Fira Code', monospace;
+            
+            --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Animated Ambient Background Grid */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 15% 25%, rgba(251, 113, 133, 0.09) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(250, 204, 21, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.04) 0%, transparent 50%),
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Top Header Navigation */
+        header {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 36px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(10, 13, 20, 0.85);
+            backdrop-filter: blur(12px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-amber));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #050811;
+            font-weight: 800;
+            font-size: 19px;
+            box-shadow: 0 4px 15px rgba(251, 113, 133, 0.3);
+        }
+
+        .brand-text h1 {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .lecture-nav-pill {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 11.5px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: var(--transition-smooth);
+        }
+
+        .lecture-nav-pill:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            border-color: var(--accent-rose);
+        }
+
+        .lecture-nav-pill.active {
+            background: rgba(251, 113, 133, 0.18);
+            color: var(--accent-rose);
+            border-color: var(--accent-rose);
+        }
+
+        .top-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-icon:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-rose);
+            background: var(--bg-card-hover);
+            transform: translateY(-1px);
+        }
+
+        .slide-counter {
+            font-family: var(--font-code);
+            font-size: 13.5px;
+            font-weight: 600;
+            background: rgba(251, 113, 133, 0.12);
+            color: var(--accent-rose);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(251, 113, 133, 0.25);
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-rose), var(--accent-amber), var(--python-blue));
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 12px rgba(251, 113, 133, 0.6);
+        }
+
+        /* Main Presentation Viewport */
+        main.presentation-stage {
+            position: relative;
+            z-index: 10;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 40px;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            max-width: 1220px;
+            height: 100%;
+            max-height: 690px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(60px) scale(0.97);
+            transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.45s;
+            pointer-events: none;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .slide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .slide.prev {
+            transform: translateX(-60px) scale(0.97);
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Slide Component Styles */
+        .slide-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+        .tag-blue { background: rgba(56, 189, 248, 0.15); color: var(--python-blue); border: 1px solid rgba(56, 189, 248, 0.3); }
+        .tag-yellow { background: rgba(250, 204, 21, 0.15); color: var(--python-yellow); border: 1px solid rgba(250, 204, 21, 0.3); }
+        .tag-green { background: rgba(74, 222, 128, 0.15); color: var(--accent-green); border: 1px solid rgba(74, 222, 128, 0.3); }
+        .tag-purple { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+        .tag-rose { background: rgba(251, 113, 133, 0.15); color: var(--accent-rose); border: 1px solid rgba(251, 113, 133, 0.3); }
+        .tag-amber { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+
+        .slide-title {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #ffffff 40%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 22px;
+            line-height: 1.5;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            align-items: stretch;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        /* Modern Glass Card */
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 22px;
+            backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(251, 113, 133, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .glass-card .card-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .glass-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .glass-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Hero Slide */
+        .hero-slide {
+            text-align: center;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(251, 113, 133, 0.12);
+            border: 1px solid rgba(251, 113, 133, 0.3);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            color: var(--accent-rose);
+            margin-bottom: 18px;
+        }
+
+        .hero-title {
+            font-size: 52px;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 18px;
+            letter-spacing: -1px;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-amber), var(--python-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 18.5px;
+            color: var(--text-secondary);
+            max-width: 820px;
+            margin: 0 auto 34px;
+            line-height: 1.6;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 26px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .hero-meta-item strong {
+            color: var(--text-primary);
+        }
+
+        /* Code Block Container */
+        .code-container {
+            background: #06090e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: var(--font-code);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d121d;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .dot-red { background: #ef4444; }
+        .dot-yellow { background: #eab308; }
+        .dot-green { background: #22c55e; }
+
+        .file-name {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            transition: var(--transition-smooth);
+        }
+
+        .copy-btn:hover {
+            color: var(--accent-rose);
+        }
+
+        .code-content {
+            padding: 16px 18px;
+            font-size: 14px;
+            line-height: 1.65;
+            color: #e2e8f0;
+            overflow-x: auto;
+            flex: 1;
+        }
+
+        .code-comment { color: #64748b; font-style: italic; }
+        .code-keyword { color: #f43f5e; font-weight: 600; }
+        .code-string { color: #4ade80; }
+        .code-function { color: #38bdf8; font-weight: 600; }
+        .code-number { color: #f59e0b; }
+        .code-builtin { color: #c084fc; }
+
+        /* Exception Lifecycle Box */
+        .lifecycle-box {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .lc-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            font-family: var(--font-code);
+            font-size: 12.5px;
+        }
+
+        .lc-card h4 { font-size: 13.5px; margin-bottom: 4px; }
+        .lc-try { border-color: rgba(56, 189, 248, 0.3); color: var(--python-blue); }
+        .lc-except { border-color: rgba(251, 113, 133, 0.3); color: var(--accent-rose); }
+        .lc-else { border-color: rgba(74, 222, 128, 0.3); color: var(--accent-green); }
+        .lc-finally { border-color: rgba(250, 204, 21, 0.3); color: var(--python-yellow); }
+
+        /* Interactive Simulator Terminal */
+        .interactive-box {
+            background: #090d16;
+            border: 1px solid rgba(251, 113, 133, 0.3);
+            border-radius: 14px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .terminal-editor {
+            background: #04060a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-family: var(--font-code);
+            font-size: 14px;
+            color: #4ade80;
+            width: 100%;
+            height: 110px;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        .terminal-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-run {
+            background: linear-gradient(135deg, #e11d48, #d97706);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-run:hover {
+            background: linear-gradient(135deg, #fb7185, #f59e0b);
+            box-shadow: 0 0 15px rgba(251, 113, 133, 0.4);
+            transform: scale(1.02);
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-preset {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-preset:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: var(--accent-rose);
+        }
+
+        .terminal-output {
+            background: #04060a;
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: var(--font-code);
+            font-size: 13.5px;
+            color: var(--python-yellow);
+            min-height: 52px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* Bottom Controls Bar */
+        footer.control-bar {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 36px;
+            border-top: 1px solid var(--border-color);
+            background: rgba(10, 13, 20, 0.85);
+            backdrop-filter: blur(12px);
+        }
+
+        .shortcuts-hint {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .key-badge {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 2px 7px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+            font-family: var(--font-code);
+            font-size: 11px;
+            margin-right: 4px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-nav {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 9px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            border-color: var(--accent-rose);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .btn-nav-primary {
+            background: linear-gradient(135deg, #e11d48, #0284c7);
+            border-color: transparent;
+        }
+
+        .btn-nav-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #fb7185, #38bdf8);
+            box-shadow: 0 0 16px rgba(251, 113, 133, 0.4);
+        }
+
+        /* Overview Drawer Modal */
+        .overview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 8, 15, 0.88);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            display: none;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .overview-modal.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .overview-modal::-webkit-scrollbar {
+            width: 8px;
+        }
+        .overview-modal::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .overview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto 30px;
+        }
+
+        .overview-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .overview-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .overview-card:hover {
+            border-color: var(--accent-rose);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+
+        .overview-card.current {
+            border-color: var(--python-yellow);
+            background: rgba(250, 204, 21, 0.05);
+        }
+
+        .overview-card .ov-num {
+            font-size: 12px;
+            color: var(--accent-rose);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .overview-card .ov-title {
+            font-size: 14.5px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            right: 30px;
+            background: #1e293b;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-rose);
+            font-size: 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 200;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 960px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .hero-title { font-size: 34px; }
+            .slide-title { font-size: 26px; }
+            header, footer.control-bar { padding: 12px 20px; }
+            main.presentation-stage { padding: 14px 18px; }
+            .shortcuts-hint { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Grid -->
+    <div class="bg-grid"></div>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="brand">
+            <div class="brand-logo">Py</div>
+            <div class="brand-text">
+                <h1>
+                    Python Fundamentals
+                    <a href="index.html" class="lecture-nav-pill" title="Go to Lecture 1">L01</a>
+                    <a href="lecture2.html" class="lecture-nav-pill" title="Go to Lecture 2">L02</a>
+                    <a href="lecture3.html" class="lecture-nav-pill" title="Go to Lecture 3">L03</a>
+                    <a href="lecture4.html" class="lecture-nav-pill" title="Go to Lecture 4">L04</a>
+                    <a href="lecture5.html" class="lecture-nav-pill" title="Go to Lecture 5">L05</a>
+                    <a href="lecture6.html" class="lecture-nav-pill" title="Go to Lecture 6">L06</a>
+                    <a href="lecture7.html" class="lecture-nav-pill" title="Go to Lecture 7">L07</a>
+                    <span class="lecture-nav-pill active">L08 (Active)</span>
+                    <a href="lecture9.html" class="lecture-nav-pill" title="Go to Lecture 9">L09</a>
+                    <a href="lecture10.html" class="lecture-nav-pill" title="Go to Lecture 10">L10</a>
+                    <a href="lecture11.html" class="lecture-nav-pill" title="Go to Lecture 11">L11</a>
+                    <a href="lecture12.html" class="lecture-nav-pill" title="Go to Lecture 12">L12</a>
+                    <a href="lecture13.html" class="lecture-nav-pill" title="Go to Lecture 13">L13</a>
+                    <a href="lecture14.html" class="lecture-nav-pill" title="Go to Lecture 14">L14</a>
+                </h1>
+                <p>Lecture 08: File I/O, Context Managers &amp; Exception Handling</p>
+            </div>
+        </div>
+
+        <div class="top-controls">
+            <div class="slide-counter" id="slideIndicator">Slide 01 / 13</div>
+            <button class="btn-icon" id="overviewBtn" title="Slide Overview (Press O)">
+                <i data-lucide="grid"></i> <span>Overview</span>
+            </button>
+            <button class="btn-icon" id="fullscreenBtn" title="Toggle Fullscreen (Press F)">
+                <i data-lucide="maximize"></i>
+            </button>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </header>
+
+    <!-- Main Presentation Stage -->
+    <main class="presentation-stage">
+
+        <!-- SLIDE 1: Title & Welcome -->
+        <section class="slide active hero-slide" data-slide="1">
+            <div class="hero-badge">
+                <i data-lucide="sparkles"></i> Class 08 • Master Class Series
+            </div>
+            <h1 class="hero-title">
+                File I/O, <span class="gradient-text">Context Managers</span> &amp; <br>Exception Handling
+            </h1>
+            <p class="hero-desc">
+                Persist data to disk and build indestructible, crash-proof applications! Master <code>with open()</code>, structured JSON/CSV data processing, <code>try/except/else/finally</code> lifecycles, and custom exceptions.
+            </p>
+            <div class="hero-meta">
+                <div class="hero-meta-item">
+                    <i data-lucide="user"></i> <span>Instructor: <strong>Robiul Suny Emon</strong></span>
+                </div>
+                <div class="hero-meta-item">
+                    <i data-lucide="code-2"></i> <span>Version: <strong>Python 3.12+</strong></span>
+                </div>
+                <div class="hero-meta-item">
+                    <i data-lucide="clock"></i> <span>Duration: <strong>90 Mins</strong></span>
+                </div>
+                <div class="hero-meta-item">
+                    <i data-lucide="layers"></i> <span>Prerequisite: <strong>Lecture 07</strong></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: Roadmap -->
+        <section class="slide" data-slide="2">
+            <span class="slide-tag tag-rose"><i data-lucide="compass"></i> Roadmap</span>
+            <h2 class="slide-title">Lecture 08 Learning Architecture</h2>
+            <p class="slide-subtitle">Four core pillars for persistent storage and bulletproof error resilience:</p>
+
+            <div class="grid-4">
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(56, 189, 248, 0.15); color: var(--python-blue);">
+                        <i data-lucide="file-text"></i>
+                    </div>
+                    <h3>01. File Modes &amp; with</h3>
+                    <p>Read (<code>r</code>), Write (<code>w</code>), Append (<code>a</code>), and the <code>with</code> context manager.</p>
+                </div>
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(250, 204, 21, 0.15); color: var(--python-yellow);">
+                        <i data-lucide="braces"></i>
+                    </div>
+                    <h3>02. JSON &amp; CSV I/O</h3>
+                    <p>Serialization with <code>json.dump()</code> / <code>load()</code> and tabular CSV parsing.</p>
+                </div>
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(251, 113, 133, 0.15); color: var(--accent-rose);">
+                        <i data-lucide="shield-alert"></i>
+                    </div>
+                    <h3>03. Try-Except Lifecycle</h3>
+                    <p>Catching specific exceptions, <code>else</code> and <code>finally</code> cleanup blocks.</p>
+                </div>
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(74, 222, 128, 0.15); color: var(--accent-green);">
+                        <i data-lucide="alert-circle"></i>
+                    </div>
+                    <h3>04. Custom Exceptions</h3>
+                    <p>Subclassing <code>Exception</code> and enforcing business rule validations.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: File I/O & The with Statement -->
+        <section class="slide" data-slide="3">
+            <span class="slide-tag tag-blue"><i data-lucide="hard-drive"></i> Disk Persistence</span>
+            <h2 class="slide-title">Context Managers: The <code>with open()</code> Statement</h2>
+            <p class="slide-subtitle">Never use manual <code>file.close()</code>! The <code>with</code> statement guarantees automatic resource cleanup even if exceptions occur:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">file_manager.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-file-io')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-file-io"><code><span class="code-comment"># 1. Writing to a file ('w' creates/overwrites)</span>
+<span class="code-keyword">with</span> <span class="code-builtin">open</span>(<span class="code-string">"server.log"</span>, <span class="code-string">"w"</span>, encoding=<span class="code-string">"utf-8"</span>) <span class="code-keyword">as</span> f:
+    f.write(<span class="code-string">"[INFO] Server initialized successfully.\n"</span>)
+    f.write(<span class="code-string">"[INFO] Port 8000 listening.\n"</span>)
+
+<span class="code-comment"># 2. Appending data ('a' preserves existing lines)</span>
+<span class="code-keyword">with</span> <span class="code-builtin">open</span>(<span class="code-string">"server.log"</span>, <span class="code-string">"a"</span>, encoding=<span class="code-string">"utf-8"</span>) <span class="code-keyword">as</span> f:
+    f.write(<span class="code-string">"[AUTH] User Robiul logged in.\n"</span>)
+
+<span class="code-comment"># 3. Line-by-line memory-efficient streaming</span>
+<span class="code-keyword">with</span> <span class="code-builtin">open</span>(<span class="code-string">"server.log"</span>, <span class="code-string">"r"</span>, encoding=<span class="code-string">"utf-8"</span>) <span class="code-keyword">as</span> f:
+    <span class="code-keyword">for</span> line <span class="code-keyword">in</span> f:
+        <span class="code-function">print</span>(line.strip())</code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="color: var(--python-blue);">Core File Opening Modes:</h3>
+                        <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; color: var(--text-secondary); margin-top: 8px;">
+                            <li><code>'r'</code>: Read (Default, error if file missing)</li>
+                            <li><code>'w'</code>: Write (Truncates/wipes existing content!)</li>
+                            <li><code>'a'</code>: Append (Adds to end of file safely)</li>
+                            <li><code>'b'</code>: Binary mode (e.g. <code>'rb'</code> for images/PDFs)</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); padding: 12px; border-radius: 8px;">
+                        <strong style="color: var(--accent-rose);">Mandatory Best Practice:</strong> Always include <code>encoding="utf-8"</code> to prevent cross-platform text corruption on Windows!
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: Working with JSON Data -->
+        <section class="slide" data-slide="4">
+            <span class="slide-tag tag-yellow"><i data-lucide="braces"></i> Structured Storage</span>
+            <h2 class="slide-title">Working with JSON (JavaScript Object Notation)</h2>
+            <p class="slide-subtitle">The universal format for REST APIs and configuration files powered by Python's built-in <code>json</code> module:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">json_persistence.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-json')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-json"><code><span class="code-keyword">import</span> json
+
+config = {
+    <span class="code-string">"app_name"</span>: <span class="code-string">"AI Assistant"</span>,
+    <span class="code-string">"version"</span>: <span class="code-number">2.5</span>,
+    <span class="code-string">"features"</span>: [<span class="code-string">"vision"</span>, <span class="code-string">"voice"</span>],
+    <span class="code-string">"active"</span>: <span class="code-bool">True</span>
+}
+
+<span class="code-comment"># 1. Dumping Python dict to a JSON file</span>
+<span class="code-keyword">with</span> <span class="code-builtin">open</span>(<span class="code-string">"config.json"</span>, <span class="code-string">"w"</span>) <span class="code-keyword">as</span> f:
+    json.dump(config, f, indent=<span class="code-number">4</span>)
+
+<span class="code-comment"># 2. Loading JSON file back into Python dict</span>
+<span class="code-keyword">with</span> <span class="code-builtin">open</span>(<span class="code-string">"config.json"</span>, <span class="code-string">"r"</span>) <span class="code-keyword">as</span> f:
+    loaded_data = json.load(f)
+
+<span class="code-function">print</span>(loaded_data[<span class="code-string">"app_name"</span>])  <span class="code-comment"># "AI Assistant"</span></code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <h3 style="color: var(--python-yellow);">Memory Cheat Sheet: <code>s</code> stands for String!</h3>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--text-secondary);">
+                        <li><strong style="color: #fff;"><code>json.dump(obj, file)</code>:</strong> Serializes object to disk <strong>File</strong>.</li>
+                        <li><strong style="color: var(--accent-green);"><code>json.dumps(obj)</code>:</strong> Serializes object to a Python <strong>String</strong>.</li>
+                        <li><strong style="color: #fff;"><code>json.load(file)</code>:</strong> Deserializes directly from disk <strong>File</strong>.</li>
+                        <li><strong style="color: var(--accent-green);"><code>json.loads(string)</code>:</strong> Deserializes from a raw JSON <strong>String</strong>.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: Exception Handling Lifecycle -->
+        <section class="slide" data-slide="5">
+            <span class="slide-tag tag-rose"><i data-lucide="shield-alert"></i> Crash-Proof Code</span>
+            <h2 class="slide-title">Exception Handling: <code>try / except / else / finally</code></h2>
+            <p class="slide-subtitle">Intercept runtime errors gracefully so your system never crashes in production:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">robust_parser.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-try')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-try"><code><span class="code-keyword">def</span> <span class="code-function">safe_division</span>(a, b):
+    <span class="code-keyword">try</span>:
+        result = a / b
+    <span class="code-keyword">except</span> <span class="code-builtin">ZeroDivisionError</span>:
+        <span class="code-function">print</span>(<span class="code-string">"❌ Error: Cannot divide by zero!"</span>)
+        <span class="code-keyword">return</span> <span class="code-builtin">None</span>
+    <span class="code-keyword">except</span> <span class="code-builtin">TypeError</span> <span class="code-keyword">as</span> e:
+        <span class="code-function">print</span>(<span class="code-string">f"❌ Error: Invalid type - {e}"</span>)
+        <span class="code-keyword">return</span> <span class="code-builtin">None</span>
+    <span class="code-keyword">else</span>:
+        <span class="code-comment"># Runs ONLY if NO exceptions occurred!</span>
+        <span class="code-function">print</span>(<span class="code-string">"✅ Calculation succeeded."</span>)
+        <span class="code-keyword">return</span> result
+    <span class="code-keyword">finally</span>:
+        <span class="code-comment"># ALWAYS runs no matter what!</span>
+        <span class="code-function">print</span>(<span class="code-string">"🔒 Cleanup / Telemetry logged."</span>)</code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="color: var(--accent-rose);">The 4 Stages of the Lifecycle:</h3>
+                        <div class="lifecycle-box">
+                            <div class="lc-card lc-try"><h4>try</h4>Risky code</div>
+                            <div class="lc-card lc-except"><h4>except</h4>Handles error</div>
+                            <div class="lc-card lc-else"><h4>else</h4>If success</div>
+                            <div class="lc-card lc-finally"><h4>finally</h4>Always runs</div>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(251, 113, 133, 0.08); border: 1px solid rgba(251, 113, 133, 0.25); padding: 12px; border-radius: 8px; font-size: 13.5px; color: #fff;">
+                        ⚠️ <strong>Golden Rule:</strong> Never write bare <code>except:</code>! Always catch specific exceptions (e.g. <code>except ValueError:</code>).
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: Raising Custom Exceptions -->
+        <section class="slide" data-slide="6">
+            <span class="slide-tag tag-purple"><i data-lucide="alert-circle"></i> Custom Architecture</span>
+            <h2 class="slide-title">Raising &amp; Defining Custom Exceptions</h2>
+            <p class="slide-subtitle">Create meaningful, domain-specific error types for enterprise business logic:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">bank_exceptions.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-custom-exc')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-custom-exc"><code><span class="code-comment"># 1. Custom Exception Class</span>
+<span class="code-keyword">class</span> <span class="code-function">InsufficientFundsError</span>(<span class="code-builtin">Exception</span>):
+    <span class="code-comment">"""Raised when account balance is lower than withdrawal."""</span>
+    <span class="code-keyword">pass</span>
+
+<span class="code-comment"># 2. Triggering with raise</span>
+<span class="code-keyword">def</span> <span class="code-function">withdraw</span>(balance: <span class="code-builtin">float</span>, amount: <span class="code-builtin">float</span>) -&gt; <span class="code-builtin">float</span>:
+    <span class="code-keyword">if</span> amount &gt; balance:
+        <span class="code-keyword">raise</span> InsufficientFundsError(<span class="code-string">f"Cannot withdraw ${amount}; balance is ${balance}."</span>)
+    <span class="code-keyword">return</span> balance - amount
+
+<span class="code-keyword">try</span>:
+    withdraw(<span class="code-number">100</span>, <span class="code-number">500</span>)
+<span class="code-keyword">except</span> InsufficientFundsError <span class="code-keyword">as</span> err:
+    <span class="code-function">print</span>(<span class="code-string">f"Caught custom error: {err}"</span>)</code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <h3 style="color: var(--accent-purple);">Why Custom Exceptions Matter:</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary);">
+                        Instead of generic <code>ValueError</code> or returning error strings like <code>"error"</code>, custom exceptions enable specific catch blocks in large frameworks (FastAPI / Django) to trigger HTTP 400 or 402 payment errors automatically!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: Common Pitfalls & Traps -->
+        <section class="slide" data-slide="7">
+            <span class="slide-tag tag-rose"><i data-lucide="alert-triangle"></i> Pitfalls</span>
+            <h2 class="slide-title">4 Common File I/O &amp; Exception Traps ⚠️</h2>
+            <p class="slide-subtitle">Avoid these high-risk errors in file systems and exception handling:</p>
+
+            <div class="grid-2">
+                <div class="glass-card" style="border-left: 4px solid var(--accent-rose);">
+                    <h3 style="color: var(--accent-rose);">❌ 1. Overwriting with 'w' Mode</h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #fda4af;">
+                        open("data.txt", "w") # Wipes all existing data!<br>
+                        Fix: Use "a" mode for appending.
+                    </p>
+                </div>
+
+                <div class="glass-card" style="border-left: 4px solid var(--python-yellow);">
+                    <h3 style="color: var(--python-yellow);">❌ 2. Bare except: Anti-Pattern</h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #fef08a;">
+                        except: pass # Catches Ctrl+C / SystemExit!<br>
+                        Fix: except Exception: (or specific errors).
+                    </p>
+                </div>
+
+                <div class="glass-card" style="border-left: 4px solid var(--python-blue);">
+                    <h3 style="color: var(--python-blue);">❌ 3. Missing UTF-8 Encoding</h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #bae6fd;">
+                        open("file.txt", "r") # Crashes on emojis in Windows!<br>
+                        Fix: Always open(..., encoding="utf-8")
+                    </p>
+                </div>
+
+                <div class="glass-card" style="border-left: 4px solid var(--accent-green);">
+                    <h3 style="color: var(--accent-green);">❌ 4. Not Closing Files (No with)</h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #bbf7d0;">
+                        f = open(...) # Locks file / resource leak!<br>
+                        Fix: Always with open(...) as f:
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: Interactive Live Sandbox -->
+        <section class="slide" data-slide="8">
+            <span class="slide-tag tag-rose"><i data-lucide="terminal-square"></i> Live Sandbox</span>
+            <h2 class="slide-title">Interactive File &amp; Exception Sandbox</h2>
+            <p class="slide-subtitle">Test try/except error handling, JSON serialization, and custom exception triggers in real-time:</p>
+
+            <div class="interactive-box">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; color: var(--text-muted); font-family: var(--font-code);">Python 3.12 Exception Simulator</span>
+                    <div class="preset-buttons">
+                        <button class="btn-preset" onclick="loadPreset(1)">JSON Stream</button>
+                        <button class="btn-preset" onclick="loadPreset(2)">Try-Except-Else</button>
+                        <button class="btn-preset" onclick="loadPreset(3)">Custom Exception</button>
+                    </div>
+                </div>
+
+                <textarea id="liveCodeInput" class="terminal-editor"># Safe JSON Parsing with Exception Handling:
+import json
+
+raw_json = '{"user": "Robiul", "role": "AI Engineer", "active": true}'
+
+try:
+    data = json.loads(raw_json)
+    print(f"Parsed Successfully: {data['user']} ({data['role']})")
+except json.JSONDecodeError as err:
+    print(f"Invalid JSON Format: {err}")
+finally:
+    print("Stream parsing finished.")</textarea>
+
+                <div class="terminal-actions">
+                    <button class="btn-run" id="runCodeBtn">
+                        <i data-lucide="play"></i> <span>Run Code</span>
+                    </button>
+                    <span style="font-size: 12px; color: var(--text-muted);">Simulated Output Console</span>
+                </div>
+
+                <div class="terminal-output" id="terminalOutput">&gt; Click "Run Code" to execute...</div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: Real-World Mini Project: Persistence Engine -->
+        <section class="slide" data-slide="9">
+            <span class="slide-tag tag-blue"><i data-lucide="database"></i> Production Pipeline</span>
+            <h2 class="slide-title">Mini-Project: Crash-Proof JSON Database</h2>
+            <p class="slide-subtitle">A robust CRUD database layer persisting user profiles with automatic file creation and backup:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">json_db.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-db-engine')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-db-engine"><code><span class="code-keyword">import</span> json
+
+<span class="code-keyword">def</span> <span class="code-function">save_user</span>(user_id: <span class="code-builtin">str</span>, name: <span class="code-builtin">str</span>, db_path=<span class="code-string">"users.json"</span>):
+    <span class="code-keyword">try</span>:
+        <span class="code-keyword">with</span> <span class="code-builtin">open</span>(db_path, <span class="code-string">"r"</span>) <span class="code-keyword">as</span> f:
+            db = json.load(f)
+    <span class="code-keyword">except</span> (<span class="code-builtin">FileNotFoundError</span>, json.JSONDecodeError):
+        db = {}  <span class="code-comment"># Initialize fresh DB if missing</span>
+
+    db[user_id] = {<span class="code-string">"name"</span>: name, <span class="code-string">"created_at"</span>: <span class="code-string">"2026-08-17"</span>}
+
+    <span class="code-keyword">with</span> <span class="code-builtin">open</span>(db_path, <span class="code-string">"w"</span>) <span class="code-keyword">as</span> f:
+        json.dump(db, f, indent=<span class="code-number">2</span>)
+    
+    <span class="code-function">print</span>(<span class="code-string">f"✅ User {name} saved successfully!"</span>)
+
+save_user(<span class="code-string">"usr_1"</span>, <span class="code-string">"Robiul Suny"</span>)</code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <h3 style="color: var(--accent-rose);">Key Engineering Design:</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary);">
+                        Notice how <code>save_user()</code> anticipates two separate failure modes simultaneously: <code>FileNotFoundError</code> (first time running) and <code>JSONDecodeError</code> (corrupted empty file). Both gracefully fall back to an empty dict <code>{}</code> without crashing the app!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: Classroom Challenge -->
+        <section class="slide" data-slide="10">
+            <span class="slide-tag tag-green"><i data-lucide="award"></i> Classroom Challenge</span>
+            <h2 class="slide-title">🧪 Classroom Hands-on Challenge</h2>
+            <p class="slide-subtitle">Open VS Code and write solutions for the following two persistence challenges (Time: 8 Mins):</p>
+
+            <div class="grid-2">
+                <div class="glass-card">
+                    <h3 style="color: var(--accent-rose);">📁 Task 1: "Automated Error Log Auditor"</h3>
+                    <p style="margin-bottom: 8px;">Create <code>log_analyzer.py</code> that reads a text log file:</p>
+                    <div style="background: #06090e; padding: 10px 12px; border-radius: 8px; font-family: var(--font-code); font-size: 12.5px; color: var(--accent-green); line-height: 1.6;">
+                        - Open and scan lines for "[ERROR]" keyword<br>
+                        - Count total error occurrences<br>
+                        - Handle FileNotFoundError gracefully with fallback message
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <h3 style="color: var(--python-yellow);">🛡️ Task 2: "Robust Safe Number Converter"</h3>
+                    <p style="margin-bottom: 8px;">Create <code>parse_float(val, default=0.0)</code> with custom error:</p>
+                    <div style="background: #06090e; padding: 10px 12px; border-radius: 8px; font-family: var(--font-code); font-size: 12.5px; color: #fde047; line-height: 1.5;">
+                        - Convert string inputs to float safely<br>
+                        - If ValueError occurs, return default value<br>
+                        - Always print a finally completion message
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 11: Q&A and Next Class Preview -->
+        <section class="slide hero-slide" data-slide="11">
+            <div class="hero-badge" style="border-color: rgba(251, 113, 133, 0.3); color: var(--accent-rose); background: rgba(251, 113, 133, 0.1);">
+                <i data-lucide="check"></i> Lecture 08 Completed!
+            </div>
+            <h1 class="hero-title">
+                Any <span class="gradient-text">Questions</span>?
+            </h1>
+            <p class="hero-desc">
+                Congratulations on mastering Python File I/O, JSON storage, and robust Exception Handling architectures!
+            </p>
+
+            <div class="glass-card" style="max-width: 680px; text-align: left; margin: 0 auto 20px; border-color: rgba(251, 113, 133, 0.35);">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    <i data-lucide="fast-forward" style="color: var(--accent-rose);"></i>
+                    <h3 style="font-size: 17px; margin: 0;">Next Lecture Preview:</h3>
+                </div>
+                <p style="font-size: 14.5px; color: var(--text-secondary); margin-bottom: 12px;">
+                    <strong>Lecture 09:</strong> Modules, Packages &amp; Virtual Environments (<code>venv</code>, <code>pip</code>, <code>requirements.txt</code>, Standard Library deep-dive: <code>os</code>, <code>sys</code>, <code>datetime</code>, <code>random</code>).
+                </p>
+                <a href="lecture9.html" class="btn-nav btn-nav-primary" style="display: inline-flex; text-decoration: none; width: fit-content; font-size: 13.5px;">
+                    Open Lecture 09 Slides <i data-lucide="arrow-right"></i>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Controls & Navigation -->
+    <footer class="control-bar">
+        <div class="shortcuts-hint">
+            <span><span class="key-badge">←</span> <span class="key-badge">→</span> Navigate</span>
+            <span><span class="key-badge">Space</span> Next</span>
+            <span><span class="key-badge">F</span> Fullscreen</span>
+            <span><span class="key-badge">O</span> Overview</span>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn-nav" id="prevBtn" disabled>
+                <i data-lucide="chevron-left"></i> Previous
+            </button>
+            <button class="btn-nav btn-nav-primary" id="nextBtn">
+                Next <i data-lucide="chevron-right"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Overview Modal Drawer -->
+    <div class="overview-modal" id="overviewModal">
+        <div class="overview-header">
+            <h2 style="font-size: 24px; font-weight: 700; color: #fff;">Lecture 08 Slides Overview</h2>
+            <button class="btn-icon" id="closeOverviewBtn">
+                <i data-lucide="x"></i> <span>Close</span>
+            </button>
+        </div>
+        <div class="overview-grid" id="overviewGrid"></div>
+    </div>
+
+    <!-- Toast Component -->
+    <div class="toast" id="toast">Code copied to clipboard!</div>
+
+    <!-- Slide Logic & Simulator Engine Script -->
+    <script>
+        let currentSlide = 1;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        const slideIndicator = document.getElementById('slideIndicator');
+        const progressBar = document.getElementById('progressBar');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const overviewBtn = document.getElementById('overviewBtn');
+        const closeOverviewBtn = document.getElementById('closeOverviewBtn');
+        const overviewModal = document.getElementById('overviewModal');
+        const overviewGrid = document.getElementById('overviewGrid');
+
+        const liveCodeInput = document.getElementById('liveCodeInput');
+        const runCodeBtn = document.getElementById('runCodeBtn');
+        const terminalOutput = document.getElementById('terminalOutput');
+        const toast = document.getElementById('toast');
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Slide Update Function
+        function updateSlide(targetIndex) {
+            if (targetIndex < 1 || targetIndex > totalSlides) return;
+
+            slides.forEach((slide, index) => {
+                const slideNum = index + 1;
+                slide.classList.remove('active', 'prev');
+                
+                if (slideNum === targetIndex) {
+                    slide.classList.add('active');
+                } else if (slideNum < targetIndex) {
+                    slide.classList.add('prev');
+                }
+            });
+
+            currentSlide = targetIndex;
+
+            // Update UI Counters & Progress
+            slideIndicator.innerText = `Slide ${String(currentSlide).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
+            const progressPercent = ((currentSlide - 1) / (totalSlides - 1)) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            // Update button states
+            prevBtn.disabled = (currentSlide === 1);
+            if (currentSlide === totalSlides) {
+                nextBtn.innerHTML = `Finish <i data-lucide="check"></i>`;
+            } else {
+                nextBtn.innerHTML = `Next <i data-lucide="chevron-right"></i>`;
+            }
+            lucide.createIcons();
+        }
+
+        // Navigation Handlers
+        prevBtn.addEventListener('click', () => updateSlide(currentSlide - 1));
+        nextBtn.addEventListener('click', () => updateSlide(currentSlide + 1));
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                e.preventDefault();
+                updateSlide(currentSlide + 1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                updateSlide(currentSlide - 1);
+            } else if (e.key.toLowerCase() === 'f') {
+                toggleFullscreen();
+            } else if (e.key.toLowerCase() === 'o') {
+                toggleOverview();
+            } else if (e.key === 'Escape') {
+                overviewModal.classList.remove('active');
+            }
+        });
+
+        // Fullscreen Toggle
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+        // Slide Overview Builder & Toggle
+        function buildOverview() {
+            overviewGrid.innerHTML = '';
+            slides.forEach((slide, idx) => {
+                const titleElem = slide.querySelector('.slide-title') || slide.querySelector('.hero-title');
+                const titleText = titleElem ? titleElem.innerText.replace(/[\n\r]+/g, ' ') : `Slide ${idx + 1}`;
+                
+                const card = document.createElement('div');
+                card.className = `overview-card ${idx + 1 === currentSlide ? 'current' : ''}`;
+                card.innerHTML = `
+                    <div class="ov-num">SLIDE ${String(idx + 1).padStart(2, '0')}</div>
+                    <div class="ov-title">${titleText.substring(0, 48)}...</div>
+                `;
+                card.addEventListener('click', () => {
+                    updateSlide(idx + 1);
+                    overviewModal.classList.remove('active');
+                });
+                overviewGrid.appendChild(card);
+            });
+        }
+
+        function toggleOverview() {
+            buildOverview();
+            overviewModal.classList.toggle('active');
+        }
+
+        overviewBtn.addEventListener('click', toggleOverview);
+        closeOverviewBtn.addEventListener('click', () => overviewModal.classList.remove('active'));
+
+        // Copy Code Snippet
+        function copyCode(elementId) {
+            const codeElem = document.getElementById(elementId);
+            if (!codeElem) return;
+            navigator.clipboard.writeText(codeElem.innerText).then(() => {
+                showToast("Code copied to clipboard!");
+            });
+        }
+
+        function showToast(msg) {
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // Live Simulated Terminal Runner Presets
+        const presets = {
+            1: `# Safe JSON Parsing with Exception Handling:
+import json
+
+raw_json = '{"user": "Robiul", "role": "AI Engineer", "active": true}'
+
+try:
+    data = json.loads(raw_json)
+    print(f"Parsed Successfully: {data['user']} ({data['role']})")
+except json.JSONDecodeError as err:
+    print(f"Invalid JSON Format: {err}")
+finally:
+    print("Stream parsing finished.")`,
+            2: `# Robust Safe Division with Try-Except-Else:
+def calculate_ratio(a, b):
+    try:
+        res = a / b
+    except ZeroDivisionError:
+        print("❌ Cannot divide by zero!")
+    else:
+        print(f"✅ Ratio Result: {res:.2f}")
+    finally:
+        print("Done.")
+
+calculate_ratio(10, 3)`,
+            3: `# Custom Business Rule Exception:
+class InvalidAgeError(Exception): pass
+
+def verify_voter(age):
+    if age < 18:
+        raise InvalidAgeError(f"Age {age} is below 18.")
+    print("✅ Voter verified.")
+
+try:
+    verify_voter(16)
+except InvalidAgeError as e:
+    print(f"Caught: {e}")`
+        };
+
+        function loadPreset(num) {
+            if (presets[num]) {
+                liveCodeInput.value = presets[num];
+                showToast(`Preset ${num} loaded!`);
+            }
+        }
+
+        // Live Simulated Python Runner Engine
+        runCodeBtn.addEventListener('click', () => {
+            const rawCode = liveCodeInput.value;
+            terminalOutput.innerHTML = `<span style="color: #94a3b8;">&gt; Executing File I/O & Exception Pipeline...</span>`;
+            
+            setTimeout(() => {
+                try {
+                    let outputLines = [];
+                    if (rawCode.includes("Parsed Successfully") || rawCode.includes("json.loads")) {
+                        outputLines.push("Parsed Successfully: Robiul (AI Engineer)");
+                        outputLines.push("Stream parsing finished.");
+                    } else if (rawCode.includes("calculate_ratio") || rawCode.includes("Ratio Result")) {
+                        outputLines.push("✅ Ratio Result: 3.33");
+                        outputLines.push("Done.");
+                    } else if (rawCode.includes("verify_voter") || rawCode.includes("InvalidAgeError")) {
+                        outputLines.push("Caught: Age 16 is below 18.");
+                    } else {
+                        outputLines.push("Executed successfully with 0 unhandled exceptions.");
+                    }
+
+                    if (outputLines.length > 0) {
+                        terminalOutput.innerHTML = outputLines.map(l => `&gt; ${l}`).join('<br>');
+                    } else {
+                        terminalOutput.innerHTML = `&gt; Code executed successfully.`;
+                    }
+                } catch (e) {
+                    terminalOutput.innerHTML = `<span style="color: #ef4444;">&gt; Error: ${e.message}</span>`;
+                }
+            }, 250);
+        });
+
+        // Initialize First Slide
+        updateSlide(1);
+    </script>
+</body>
+</html>

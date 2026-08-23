@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 09: Python Modules, Packages & Virtual Environments</title>
+    <meta name="description" content="Python Fundamentals Lecture 09 Slides: Modules, Packages, __name__ == '__main__', Virtual Environments (venv, pip, requirements.txt), and Standard Library (os, sys, datetime, pathlib).">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0a0d14;
+            --bg-secondary: #111622;
+            --bg-card: rgba(22, 30, 46, 0.75);
+            --bg-card-hover: rgba(30, 41, 64, 0.9);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(20, 184, 166, 0.3);
+            
+            --python-blue: #38bdf8;
+            --python-yellow: #facc15;
+            --accent-green: #4ade80;
+            --accent-teal: #14b8a6;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #a855f7;
+            --accent-rose: #fb7185;
+            --accent-amber: #f59e0b;
+            --accent-indigo: #818cf8;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --font-main: 'Outfit', 'Inter', sans-serif;
+            --font-code: 'Fira Code', monospace;
+            
+            --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Animated Ambient Background Grid */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(20, 184, 166, 0.09) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(129, 140, 248, 0.04) 0%, transparent 50%),
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Top Header Navigation */
+        header {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 36px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(10, 13, 20, 0.85);
+            backdrop-filter: blur(12px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-teal), var(--python-blue));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #050811;
+            font-weight: 800;
+            font-size: 19px;
+            box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
+        }
+
+        .brand-text h1 {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .lecture-nav-pill {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 11.5px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: var(--transition-smooth);
+        }
+
+        .lecture-nav-pill:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            border-color: var(--accent-teal);
+        }
+
+        .lecture-nav-pill.active {
+            background: rgba(20, 184, 166, 0.18);
+            color: var(--accent-teal);
+            border-color: var(--accent-teal);
+        }
+
+        .top-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-icon:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-teal);
+            background: var(--bg-card-hover);
+            transform: translateY(-1px);
+        }
+
+        .slide-counter {
+            font-family: var(--font-code);
+            font-size: 13.5px;
+            font-weight: 600;
+            background: rgba(20, 184, 166, 0.12);
+            color: var(--accent-teal);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(20, 184, 166, 0.25);
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-teal), var(--python-blue), var(--python-yellow));
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 12px rgba(20, 184, 166, 0.6);
+        }
+
+        /* Main Presentation Viewport */
+        main.presentation-stage {
+            position: relative;
+            z-index: 10;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 40px;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            max-width: 1220px;
+            height: 100%;
+            max-height: 690px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(60px) scale(0.97);
+            transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.45s;
+            pointer-events: none;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .slide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .slide.prev {
+            transform: translateX(-60px) scale(0.97);
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Slide Component Styles */
+        .slide-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+        .tag-blue { background: rgba(56, 189, 248, 0.15); color: var(--python-blue); border: 1px solid rgba(56, 189, 248, 0.3); }
+        .tag-yellow { background: rgba(250, 204, 21, 0.15); color: var(--python-yellow); border: 1px solid rgba(250, 204, 21, 0.3); }
+        .tag-green { background: rgba(74, 222, 128, 0.15); color: var(--accent-green); border: 1px solid rgba(74, 222, 128, 0.3); }
+        .tag-teal { background: rgba(20, 184, 166, 0.15); color: var(--accent-teal); border: 1px solid rgba(20, 184, 166, 0.3); }
+        .tag-purple { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+        .tag-rose { background: rgba(251, 113, 133, 0.15); color: var(--accent-rose); border: 1px solid rgba(251, 113, 133, 0.3); }
+
+        .slide-title {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #ffffff 40%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 22px;
+            line-height: 1.5;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            align-items: stretch;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        /* Modern Glass Card */
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 22px;
+            backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(20, 184, 166, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .glass-card .card-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .glass-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .glass-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Hero Slide */
+        .hero-slide {
+            text-align: center;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 184, 166, 0.12);
+            border: 1px solid rgba(20, 184, 166, 0.3);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            color: var(--accent-teal);
+            margin-bottom: 18px;
+        }
+
+        .hero-title {
+            font-size: 52px;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 18px;
+            letter-spacing: -1px;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--accent-teal), var(--python-blue), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 18.5px;
+            color: var(--text-secondary);
+            max-width: 820px;
+            margin: 0 auto 34px;
+            line-height: 1.6;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 26px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .hero-meta-item strong {
+            color: var(--text-primary);
+        }
+
+        /* Code Block Container */
+        .code-container {
+            background: #06090e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            overflow: hidden;
+            font-family: var(--font-code);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #0d121d;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .dot-red { background: #ef4444; }
+        .dot-yellow { background: #eab308; }
+        .dot-green { background: #22c55e; }
+
+        .file-name {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            transition: var(--transition-smooth);
+        }
+
+        .copy-btn:hover {
+            color: var(--accent-teal);
+        }
+
+        .code-content {
+            padding: 16px 18px;
+            font-size: 14px;
+            line-height: 1.65;
+            color: #e2e8f0;
+            overflow-x: auto;
+            flex: 1;
+        }
+
+        .code-comment { color: #64748b; font-style: italic; }
+        .code-keyword { color: #f43f5e; font-weight: 600; }
+        .code-string { color: #4ade80; }
+        .code-function { color: #38bdf8; font-weight: 600; }
+        .code-number { color: #f59e0b; }
+        .code-builtin { color: #c084fc; }
+
+        /* Command Line Box */
+        .cli-box {
+            background: #030509;
+            border: 1px solid rgba(20, 184, 166, 0.25);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-family: var(--font-code);
+            font-size: 13px;
+            color: #a7f3d0;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        /* Interactive Simulator Terminal */
+        .interactive-box {
+            background: #090d16;
+            border: 1px solid rgba(20, 184, 166, 0.3);
+            border-radius: 14px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .terminal-editor {
+            background: #04060a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-family: var(--font-code);
+            font-size: 14px;
+            color: #4ade80;
+            width: 100%;
+            height: 110px;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        .terminal-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-run {
+            background: linear-gradient(135deg, #0d9488, #0284c7);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-run:hover {
+            background: linear-gradient(135deg, #14b8a6, #38bdf8);
+            box-shadow: 0 0 15px rgba(20, 184, 166, 0.4);
+            transform: scale(1.02);
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-preset {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-preset:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: var(--accent-teal);
+        }
+
+        .terminal-output {
+            background: #04060a;
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: var(--font-code);
+            font-size: 13.5px;
+            color: var(--python-yellow);
+            min-height: 52px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* Bottom Controls Bar */
+        footer.control-bar {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 36px;
+            border-top: 1px solid var(--border-color);
+            background: rgba(10, 13, 20, 0.85);
+            backdrop-filter: blur(12px);
+        }
+
+        .shortcuts-hint {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .key-badge {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 2px 7px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+            font-family: var(--font-code);
+            font-size: 11px;
+            margin-right: 4px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-nav {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 9px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            border-color: var(--accent-teal);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .btn-nav-primary {
+            background: linear-gradient(135deg, #0d9488, #0284c7);
+            border-color: transparent;
+        }
+
+        .btn-nav-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #14b8a6, #38bdf8);
+            box-shadow: 0 0 16px rgba(20, 184, 166, 0.4);
+        }
+
+        /* Overview Drawer Modal */
+        .overview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 8, 15, 0.88);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            display: none;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .overview-modal.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .overview-modal::-webkit-scrollbar {
+            width: 8px;
+        }
+        .overview-modal::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .overview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto 30px;
+        }
+
+        .overview-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .overview-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .overview-card:hover {
+            border-color: var(--accent-teal);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+
+        .overview-card.current {
+            border-color: var(--python-yellow);
+            background: rgba(250, 204, 21, 0.05);
+        }
+
+        .overview-card .ov-num {
+            font-size: 12px;
+            color: var(--accent-teal);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .overview-card .ov-title {
+            font-size: 14.5px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            right: 30px;
+            background: #1e293b;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-teal);
+            font-size: 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 200;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 960px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .hero-title { font-size: 34px; }
+            .slide-title { font-size: 26px; }
+            header, footer.control-bar { padding: 12px 20px; }
+            main.presentation-stage { padding: 14px 18px; }
+            .shortcuts-hint { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Grid -->
+    <div class="bg-grid"></div>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="brand">
+            <div class="brand-logo">Py</div>
+            <div class="brand-text">
+                <h1>
+                    Python Fundamentals
+                    <a href="index.html" class="lecture-nav-pill" title="Go to Lecture 1">L01</a>
+                    <a href="lecture2.html" class="lecture-nav-pill" title="Go to Lecture 2">L02</a>
+                    <a href="lecture3.html" class="lecture-nav-pill" title="Go to Lecture 3">L03</a>
+                    <a href="lecture4.html" class="lecture-nav-pill" title="Go to Lecture 4">L04</a>
+                    <a href="lecture5.html" class="lecture-nav-pill" title="Go to Lecture 5">L05</a>
+                    <a href="lecture6.html" class="lecture-nav-pill" title="Go to Lecture 6">L06</a>
+                    <a href="lecture7.html" class="lecture-nav-pill" title="Go to Lecture 7">L07</a>
+                    <a href="lecture8.html" class="lecture-nav-pill" title="Go to Lecture 8">L08</a>
+                    <span class="lecture-nav-pill active">L09 (Active)</span>
+                    <a href="lecture10.html" class="lecture-nav-pill" title="Go to Lecture 10">L10</a>
+                    <a href="lecture11.html" class="lecture-nav-pill" title="Go to Lecture 11">L11</a>
+                    <a href="lecture12.html" class="lecture-nav-pill" title="Go to Lecture 12">L12</a>
+                    <a href="lecture13.html" class="lecture-nav-pill" title="Go to Lecture 13">L13</a>
+                    <a href="lecture14.html" class="lecture-nav-pill" title="Go to Lecture 14">L14</a>
+                </h1>
+                <p>Lecture 09: Modules, Packages &amp; Virtual Environments</p>
+            </div>
+        </div>
+
+        <div class="top-controls">
+            <div class="slide-counter" id="slideIndicator">Slide 01 / 13</div>
+            <button class="btn-icon" id="overviewBtn" title="Slide Overview (Press O)">
+                <i data-lucide="grid"></i> <span>Overview</span>
+            </button>
+            <button class="btn-icon" id="fullscreenBtn" title="Toggle Fullscreen (Press F)">
+                <i data-lucide="maximize"></i>
+            </button>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </header>
+
+    <!-- Main Presentation Stage -->
+    <main class="presentation-stage">
+
+        <!-- SLIDE 1: Title & Welcome -->
+        <section class="slide active hero-slide" data-slide="1">
+            <div class="hero-badge">
+                <i data-lucide="sparkles"></i> Class 09 • Master Class Series
+            </div>
+            <h1 class="hero-title">
+                Modules, Packages &amp; <br><span class="gradient-text">Virtual Environments</span>
+            </h1>
+            <p class="hero-desc">
+                Architect professional, multi-file codebases and isolate dependencies! Master modular <code>import</code> systems, the <code>__name__ == "__main__"</code> idiom, <code>venv</code>, <code>pip</code>, <code>requirements.txt</code>, and standard library powerhouses (<code>os</code>, <code>sys</code>, <code>datetime</code>, <code>pathlib</code>).
+            </p>
+            <div class="hero-meta">
+                <div class="hero-meta-item">
+                    <i data-lucide="user"></i> <span>Instructor: <strong>Robiul Suny Emon</strong></span>
+                </div>
+                <div class="hero-meta-item">
+                    <i data-lucide="code-2"></i> <span>Version: <strong>Python 3.12+</strong></span>
+                </div>
+                <div class="hero-meta-item">
+                    <i data-lucide="clock"></i> <span>Duration: <strong>90 Mins</strong></span>
+                </div>
+                <div class="hero-meta-item">
+                    <i data-lucide="layers"></i> <span>Prerequisite: <strong>Lecture 08</strong></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: Roadmap -->
+        <section class="slide" data-slide="2">
+            <span class="slide-tag tag-teal"><i data-lucide="compass"></i> Roadmap</span>
+            <h2 class="slide-title">Lecture 09 Architecture Blueprint</h2>
+            <p class="slide-subtitle">Four foundational pillars for modern Python package management and tooling:</p>
+
+            <div class="grid-4">
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(20, 184, 166, 0.15); color: var(--accent-teal);">
+                        <i data-lucide="box"></i>
+                    </div>
+                    <h3>01. Modules &amp; Packages</h3>
+                    <p>Modular imports, namespaces, <code>__init__.py</code>, and avoiding circular imports.</p>
+                </div>
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(56, 189, 248, 0.15); color: var(--python-blue);">
+                        <i data-lucide="terminal"></i>
+                    </div>
+                    <h3>02. __name__ == "__main__"</h3>
+                    <p>Execution entry-points, reusable library files vs. standalone CLI runners.</p>
+                </div>
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(250, 204, 21, 0.15); color: var(--python-yellow);">
+                        <i data-lucide="package-check"></i>
+                    </div>
+                    <h3>03. Virtual Envs (venv &amp; pip)</h3>
+                    <p>Environment isolation, <code>pip freeze</code>, and <code>requirements.txt</code> workflows.</p>
+                </div>
+                <div class="glass-card">
+                    <div class="card-icon" style="background: rgba(74, 222, 128, 0.15); color: var(--accent-green);">
+                        <i data-lucide="cpu"></i>
+                    </div>
+                    <h3>04. Standard Library</h3>
+                    <p>Operating system utilities (<code>os</code>, <code>pathlib</code>), <code>sys.argv</code>, and <code>datetime</code>.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: Modules & Import Syntax -->
+        <section class="slide" data-slide="3">
+            <span class="slide-tag tag-teal"><i data-lucide="folder-tree"></i> Code Organization</span>
+            <h2 class="slide-title">Python Modules &amp; Clean Import Patterns</h2>
+            <p class="slide-subtitle">A module is simply any <code>.py</code> file; a package is a folder of modules:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">import_styles.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-imports')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-imports"><code><span class="code-comment"># 1. Standard Module Import</span>
+<span class="code-keyword">import</span> math
+<span class="code-function">print</span>(math.sqrt(<span class="code-number">16</span>))  <span class="code-comment"># 4.0</span>
+
+<span class="code-comment"># 2. Specific Item Import</span>
+<span class="code-keyword">from</span> datetime <span class="code-keyword">import</span> datetime, timedelta
+now = datetime.now()
+
+<span class="code-comment"># 3. Aliased Import</span>
+<span class="code-keyword">import</span> pathlib <span class="code-keyword">as</span> pl
+
+<span class="code-comment"># ❌ Dangerous Anti-Pattern: Namespace Pollution!</span>
+<span class="code-comment"># from math import *  (NEVER use in production!)</span></code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <h3 style="color: var(--accent-teal);">Why Wildcard Imports (<code>*</code>) are Banned:</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary);">
+                        <code>from module import *</code> dumps hundreds of unknown variables into your global namespace. If two modules define a function named <code>open()</code> or <code>calc()</code>, one will silently overwrite the other, creating hidden runtime bugs!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: __name__ == "__main__" -->
+        <section class="slide" data-slide="4">
+            <span class="slide-tag tag-blue"><i data-lucide="play-circle"></i> Execution Guard</span>
+            <h2 class="slide-title">The <code>if __name__ == "__main__":</code> Guard</h2>
+            <p class="slide-subtitle">Distinguish between running a file directly as a script versus importing it as a library module:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">math_utils.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-dunder-main')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-dunder-main"><code><span class="code-keyword">def</span> <span class="code-function">add_tax</span>(amount: <span class="code-builtin">float</span>, rate=<span class="code-number">0.15</span>) -&gt; <span class="code-builtin">float</span>:
+    <span class="code-keyword">return</span> amount * (<span class="code-number">1</span> + rate)
+
+<span class="code-comment"># This block ONLY executes when running: python math_utils.py</span>
+<span class="code-comment"># It will NOT run when imported by another file!</span>
+<span class="code-keyword">if</span> __name__ == <span class="code-string">"__main__"</span>:
+    <span class="code-function">print</span>(<span class="code-string">"Running self-test..."</span>)
+    test_result = add_tax(<span class="code-number">100</span>)
+    <span class="code-function">print</span>(<span class="code-string">f"Test Passed: {test_result == 115.0}"</span>)</code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <h3 style="color: var(--python-blue);">How Python Sets <code>__name__</code>:</h3>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--text-secondary);">
+                        <li><strong style="color: #fff;">Direct Run (CLI):</strong> Python assigns <code>__name__ = "__main__"</code>.</li>
+                        <li><strong style="color: var(--accent-teal);">Imported via <code>import</code>:</strong> Python sets <code>__name__ = "math_utils"</code> (file basename).</li>
+                        <li><strong style="color: var(--python-yellow);">Key Advantage:</strong> Enables files to act both as reusable modules AND standalone CLI scripts!</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: Virtual Environments & pip -->
+        <section class="slide" data-slide="5">
+            <span class="slide-tag tag-yellow"><i data-lucide="package"></i> Isolation Architecture</span>
+            <h2 class="slide-title">Virtual Environments &amp; Dependency Locking</h2>
+            <p class="slide-subtitle">Isolate project dependencies so different projects never suffer package version collisions:</p>
+
+            <div class="grid-2">
+                <div class="glass-card">
+                    <h3 style="color: var(--accent-teal); font-size: 16px;">1. Terminal Workflow (venv creation):</h3>
+                    <div class="cli-box">
+                        <span style="color: #64748b;"># 1. Create a virtual environment (.venv)</span><br>
+                        python -m venv .venv<br><br>
+                        <span style="color: #64748b;"># 2. Activate on Windows PowerShell:</span><br>
+                        .\.venv\Scripts\Activate.ps1<br><br>
+                        <span style="color: #64748b;"># 2b. Activate on macOS/Linux:</span><br>
+                        source .venv/bin/activate
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <h3 style="color: var(--python-yellow); font-size: 16px;">2. Dependency Pinning with pip:</h3>
+                    <div class="cli-box">
+                        <span style="color: #64748b;"># Install a package:</span><br>
+                        pip install requests<br><br>
+                        <span style="color: #64748b;"># Freeze exact dependencies to file:</span><br>
+                        pip freeze &gt; requirements.txt<br><br>
+                        <span style="color: #64748b;"># Teammate reproduces identical environment:</span><br>
+                        pip install -r requirements.txt
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: Standard Library Superpowers (os, pathlib, sys) -->
+        <section class="slide" data-slide="6">
+            <span class="slide-tag tag-green"><i data-lucide="cpu"></i> Standard Library</span>
+            <h2 class="slide-title">Standard Library: <code>pathlib</code>, <code>sys</code> &amp; <code>datetime</code></h2>
+            <p class="slide-subtitle">Python comes with "batteries included" &mdash; powerful built-in toolkits requiring zero installation:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">stdlib_demo.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-stdlib')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-stdlib"><code><span class="code-keyword">import</span> sys
+<span class="code-keyword">from</span> pathlib <span class="code-keyword">import</span> Path
+<span class="code-keyword">from</span> datetime <span class="code-keyword">import</span> datetime
+
+<span class="code-comment"># Modern Pathlib (Cross-platform path handling)</span>
+data_dir = Path(<span class="code-string">"storage"</span>) / <span class="code-string">"logs"</span>
+data_dir.mkdir(parents=<span class="code-bool">True</span>, exist_ok=<span class="code-bool">True</span>)
+
+<span class="code-comment"># Timestamp Formatting</span>
+timestamp = datetime.now().strftime(<span class="code-string">"%Y-%m-%d %H:%M:%S"</span>)
+<span class="code-function">print</span>(<span class="code-string">f"[{timestamp}] OS Platform: {sys.platform}"</span>)
+
+<span class="code-comment"># CLI Arguments: python script.py arg1 arg2</span>
+<span class="code-function">print</span>(<span class="code-string">f"CLI Arguments Passed: {sys.argv}"</span>)</code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <h3 style="color: var(--accent-green);">Batteries Included Highlights:</h3>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; color: var(--text-secondary);">
+                        <li><code>pathlib.Path</code>: Modern object-oriented path manipulation</li>
+                        <li><code>sys.argv</code>: Command-line argument vector list</li>
+                        <li><code>datetime.strftime()</code>: Format timestamps into clean strings</li>
+                        <li><code>secrets</code>: Cryptographically secure tokens &amp; random passwords</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: Common Pitfalls & Traps -->
+        <section class="slide" data-slide="7">
+            <span class="slide-tag tag-rose"><i data-lucide="alert-triangle"></i> Pitfalls</span>
+            <h2 class="slide-title">4 Common Module &amp; Package Pitfalls ⚠️</h2>
+            <p class="slide-subtitle">Avoid these four frequent architectural and virtual environment mistakes:</p>
+
+            <div class="grid-2">
+                <div class="glass-card" style="border-left: 4px solid var(--accent-rose);">
+                    <h3 style="color: var(--accent-rose);">❌ 1. Naming File Same as Module</h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #fda4af;">
+                        Naming file "math.py" or "random.py"<br>
+                        Shadows Python's built-in module &rarr; crashes!
+                    </p>
+                </div>
+
+                <div class="glass-card" style="border-left: 4px solid var(--python-yellow);">
+                    <h3 style="color: var(--python-yellow);">❌ 2. Circular Imports</h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #fef08a;">
+                        A.py imports B.py, and B.py imports A.py<br>
+                        Fix: Restructure shared logic into utils.py
+                    </p>
+                </div>
+
+                <div class="glass-card" style="border-left: 4px solid var(--python-blue);">
+                    <h3 style="color: var(--python-blue);">❌ 3. Committing .venv to Git</h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #bae6fd;">
+                        Uploading thousands of venv binary files!<br>
+                        Fix: Always add .venv/ to .gitignore
+                    </p>
+                </div>
+
+                <div class="glass-card" style="border-left: 4px solid var(--accent-teal);">
+                    <h3 style="color: var(--accent-teal);">❌ 4. Installing Globally Without venv</h3>
+                    <p style="font-family: var(--font-code); font-size: 13px; margin: 6px 0; color: #99f6e4;">
+                        Pollutes system Python &amp; breaks OS packages.<br>
+                        Fix: Always verify active (.venv) prompt!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: Interactive Live Sandbox -->
+        <section class="slide" data-slide="8">
+            <span class="slide-tag tag-teal"><i data-lucide="terminal-square"></i> Live Sandbox</span>
+            <h2 class="slide-title">Interactive Modules &amp; Datetime Sandbox</h2>
+            <p class="slide-subtitle">Test custom module exports, CLI argument processing, and datetime formats in your browser:</p>
+
+            <div class="interactive-box">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; color: var(--text-muted); font-family: var(--font-code);">Python 3.12 Module Simulator</span>
+                    <div class="preset-buttons">
+                        <button class="btn-preset" onclick="loadPreset(1)">Datetime</button>
+                        <button class="btn-preset" onclick="loadPreset(2)">Sys CLI</button>
+                        <button class="btn-preset" onclick="loadPreset(3)">Pathlib</button>
+                    </div>
+                </div>
+
+                <textarea id="liveCodeInput" class="terminal-editor"># Timestamp Generator & Datetime Math:
+from datetime import datetime, timedelta
+
+current_time = datetime.now()
+expiry = current_time + timedelta(days=7, hours=2)
+
+print(f"Issued At: {current_time.strftime('%Y-%m-%d %H:%M')}")
+print(f"Token Expiry: {expiry.strftime('%Y-%m-%d %H:%M')}")</textarea>
+
+                <div class="terminal-actions">
+                    <button class="btn-run" id="runCodeBtn">
+                        <i data-lucide="play"></i> <span>Run Code</span>
+                    </button>
+                    <span style="font-size: 12px; color: var(--text-muted);">Simulated Output Console</span>
+                </div>
+
+                <div class="terminal-output" id="terminalOutput">&gt; Click "Run Code" to execute...</div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: Real-World Mini Project: CLI File Organizer -->
+        <section class="slide" data-slide="9">
+            <span class="slide-tag tag-blue"><i data-lucide="folder-check"></i> Applied Project</span>
+            <h2 class="slide-title">Mini-Project: Automated CLI Log &amp; File Sorter</h2>
+            <p class="slide-subtitle">A modular system utility sorting files by extension and logging timestamps with <code>pathlib</code>:</p>
+
+            <div class="grid-2">
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="file-name">cleaner_cli.py</div>
+                        <button class="copy-btn" onclick="copyCode('code-block-cli-tool')"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre class="code-content" id="code-block-cli-tool"><code><span class="code-keyword">import</span> sys
+<span class="code-keyword">from</span> pathlib <span class="code-keyword">import</span> Path
+<span class="code-keyword">from</span> datetime <span class="code-keyword">import</span> datetime
+
+<span class="code-keyword">def</span> <span class="code-function">scan_directory</span>(target_path: <span class="code-builtin">str</span>):
+    folder = Path(target_path)
+    <span class="code-keyword">if</span> <span class="code-keyword">not</span> folder.exists():
+        <span class="code-function">print</span>(<span class="code-string">f"❌ Error: {target_path} not found."</span>)
+        <span class="code-keyword">return</span>
+
+    files = [f.name <span class="code-keyword">for</span> f <span class="code-keyword">in</span> folder.iterdir() <span class="code-keyword">if</span> f.is_file()]
+    now = datetime.now().strftime(<span class="code-string">"%H:%M:%S"</span>)
+    <span class="code-function">print</span>(<span class="code-string">f"[{now}] Scanned {len(files)} files in '{target_path}'"</span>)
+
+<span class="code-keyword">if</span> __name__ == <span class="code-string">"__main__"</span>:
+    target = sys.argv[<span class="code-number">1</span>] <span class="code-keyword">if</span> <span class="code-function">len</span>(sys.argv) &gt; <span class="code-number">1</span> <span class="code-keyword">else</span> <span class="code-string">"."</span>
+    scan_directory(target)</code></pre>
+                </div>
+
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <h3 style="color: var(--accent-teal);">Modular Production Architecture:</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary);">
+                        This script can be called from command line (<code>python cleaner_cli.py ./downloads</code>) or imported seamlessly inside an automated Celery background worker without executing CLI parsing!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: Classroom Challenge -->
+        <section class="slide" data-slide="10">
+            <span class="slide-tag tag-green"><i data-lucide="award"></i> Classroom Challenge</span>
+            <h2 class="slide-title">🧪 Classroom Hands-on Challenge</h2>
+            <p class="slide-subtitle">Open VS Code and write solutions for the following two modular tasks (Time: 8 Mins):</p>
+
+            <div class="grid-2">
+                <div class="glass-card">
+                    <h3 style="color: var(--accent-teal);">📦 Task 1: "Multi-File Helper Architecture"</h3>
+                    <p style="margin-bottom: 8px;">Create <code>validators.py</code> and <code>app.py</code>:</p>
+                    <div style="background: #06090e; padding: 10px 12px; border-radius: 8px; font-family: var(--font-code); font-size: 12.5px; color: var(--accent-green); line-height: 1.6;">
+                        - <code>validators.py</code> defines <code>is_valid_email(email)</code><br>
+                        - Guard self-tests with <code>if __name__ == '__main__':</code><br>
+                        - Import and test from <code>app.py</code>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <h3 style="color: var(--python-yellow);">🔐 Task 2: "Secure Token Generator"</h3>
+                    <p style="margin-bottom: 8px;">Create <code>token_gen.py</code> using <code>secrets</code> and <code>datetime</code>:</p>
+                    <div style="background: #06090e; padding: 10px 12px; border-radius: 8px; font-family: var(--font-code); font-size: 12.5px; color: #fde047; line-height: 1.5;">
+                        - Generate 32-byte hex token with <code>secrets.token_hex()</code><br>
+                        - Set expiry timestamp to +24 hours<br>
+                        - Return clean dictionary with token metadata
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 11: Q&A and Next Class Preview -->
+        <section class="slide hero-slide" data-slide="11">
+            <div class="hero-badge" style="border-color: rgba(20, 184, 166, 0.3); color: var(--accent-teal); background: rgba(20, 184, 166, 0.1);">
+                <i data-lucide="check"></i> Lecture 09 Completed!
+            </div>
+            <h1 class="hero-title">
+                Any <span class="gradient-text">Questions</span>?
+            </h1>
+            <p class="hero-desc">
+                Congratulations on mastering Python Modules, Packages, Virtual Environments, and Standard Library utilities!
+            </p>
+
+            <div class="glass-card" style="max-width: 680px; text-align: left; margin: 0 auto 20px; border-color: rgba(20, 184, 166, 0.35);">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    <i data-lucide="fast-forward" style="color: var(--accent-teal);"></i>
+                    <h3 style="font-size: 17px; margin: 0;">Next Lecture Preview:</h3>
+                </div>
+                <p style="font-size: 14.5px; color: var(--text-secondary); margin-bottom: 12px;">
+                    <strong>Lecture 10:</strong> Object-Oriented Programming (OOP) Part 1 (Classes, Objects, <code>__init__</code> Constructor, <code>self</code>, Instance vs Class Attributes, and Encapsulation).
+                </p>
+                <a href="lecture10.html" class="btn-nav btn-nav-primary" style="display: inline-flex; text-decoration: none; width: fit-content; font-size: 13.5px;">
+                    Open Lecture 10 Slides <i data-lucide="arrow-right"></i>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Controls & Navigation -->
+    <footer class="control-bar">
+        <div class="shortcuts-hint">
+            <span><span class="key-badge">←</span> <span class="key-badge">→</span> Navigate</span>
+            <span><span class="key-badge">Space</span> Next</span>
+            <span><span class="key-badge">F</span> Fullscreen</span>
+            <span><span class="key-badge">O</span> Overview</span>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn-nav" id="prevBtn" disabled>
+                <i data-lucide="chevron-left"></i> Previous
+            </button>
+            <button class="btn-nav btn-nav-primary" id="nextBtn">
+                Next <i data-lucide="chevron-right"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Overview Modal Drawer -->
+    <div class="overview-modal" id="overviewModal">
+        <div class="overview-header">
+            <h2 style="font-size: 24px; font-weight: 700; color: #fff;">Lecture 09 Slides Overview</h2>
+            <button class="btn-icon" id="closeOverviewBtn">
+                <i data-lucide="x"></i> <span>Close</span>
+            </button>
+        </div>
+        <div class="overview-grid" id="overviewGrid"></div>
+    </div>
+
+    <!-- Toast Component -->
+    <div class="toast" id="toast">Code copied to clipboard!</div>
+
+    <!-- Slide Logic & Simulator Engine Script -->
+    <script>
+        let currentSlide = 1;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        const slideIndicator = document.getElementById('slideIndicator');
+        const progressBar = document.getElementById('progressBar');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const overviewBtn = document.getElementById('overviewBtn');
+        const closeOverviewBtn = document.getElementById('closeOverviewBtn');
+        const overviewModal = document.getElementById('overviewModal');
+        const overviewGrid = document.getElementById('overviewGrid');
+
+        const liveCodeInput = document.getElementById('liveCodeInput');
+        const runCodeBtn = document.getElementById('runCodeBtn');
+        const terminalOutput = document.getElementById('terminalOutput');
+        const toast = document.getElementById('toast');
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Slide Update Function
+        function updateSlide(targetIndex) {
+            if (targetIndex < 1 || targetIndex > totalSlides) return;
+
+            slides.forEach((slide, index) => {
+                const slideNum = index + 1;
+                slide.classList.remove('active', 'prev');
+                
+                if (slideNum === targetIndex) {
+                    slide.classList.add('active');
+                } else if (slideNum < targetIndex) {
+                    slide.classList.add('prev');
+                }
+            });
+
+            currentSlide = targetIndex;
+
+            // Update UI Counters & Progress
+            slideIndicator.innerText = `Slide ${String(currentSlide).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
+            const progressPercent = ((currentSlide - 1) / (totalSlides - 1)) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            // Update button states
+            prevBtn.disabled = (currentSlide === 1);
+            if (currentSlide === totalSlides) {
+                nextBtn.innerHTML = `Finish <i data-lucide="check"></i>`;
+            } else {
+                nextBtn.innerHTML = `Next <i data-lucide="chevron-right"></i>`;
+            }
+            lucide.createIcons();
+        }
+
+        // Navigation Handlers
+        prevBtn.addEventListener('click', () => updateSlide(currentSlide - 1));
+        nextBtn.addEventListener('click', () => updateSlide(currentSlide + 1));
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                e.preventDefault();
+                updateSlide(currentSlide + 1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                updateSlide(currentSlide - 1);
+            } else if (e.key.toLowerCase() === 'f') {
+                toggleFullscreen();
+            } else if (e.key.toLowerCase() === 'o') {
+                toggleOverview();
+            } else if (e.key === 'Escape') {
+                overviewModal.classList.remove('active');
+            }
+        });
+
+        // Fullscreen Toggle
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+        // Slide Overview Builder & Toggle
+        function buildOverview() {
+            overviewGrid.innerHTML = '';
+            slides.forEach((slide, idx) => {
+                const titleElem = slide.querySelector('.slide-title') || slide.querySelector('.hero-title');
+                const titleText = titleElem ? titleElem.innerText.replace(/[\n\r]+/g, ' ') : `Slide ${idx + 1}`;
+                
+                const card = document.createElement('div');
+                card.className = `overview-card ${idx + 1 === currentSlide ? 'current' : ''}`;
+                card.innerHTML = `
+                    <div class="ov-num">SLIDE ${String(idx + 1).padStart(2, '0')}</div>
+                    <div class="ov-title">${titleText.substring(0, 48)}...</div>
+                `;
+                card.addEventListener('click', () => {
+                    updateSlide(idx + 1);
+                    overviewModal.classList.remove('active');
+                });
+                overviewGrid.appendChild(card);
+            });
+        }
+
+        function toggleOverview() {
+            buildOverview();
+            overviewModal.classList.toggle('active');
+        }
+
+        overviewBtn.addEventListener('click', toggleOverview);
+        closeOverviewBtn.addEventListener('click', () => overviewModal.classList.remove('active'));
+
+        // Copy Code Snippet
+        function copyCode(elementId) {
+            const codeElem = document.getElementById(elementId);
+            if (!codeElem) return;
+            navigator.clipboard.writeText(codeElem.innerText).then(() => {
+                showToast("Code copied to clipboard!");
+            });
+        }
+
+        function showToast(msg) {
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // Live Simulated Terminal Runner Presets
+        const presets = {
+            1: `# Timestamp Generator & Datetime Math:
+from datetime import datetime, timedelta
+
+current_time = datetime.now()
+expiry = current_time + timedelta(days=7, hours=2)
+
+print(f"Issued At: {current_time.strftime('%Y-%m-%d %H:%M')}")
+print(f"Token Expiry: {expiry.strftime('%Y-%m-%d %H:%M')}")`,
+            2: `# CLI Arguments Inspector (sys.argv):
+import sys
+
+args = ["script.py", "--port", "8080", "--debug"]
+print(f"Program: {args[0]}")
+print(f"Flags detected: {args[1:]}")`,
+            3: `# Pathlib Directory Creation:
+from pathlib import Path
+
+p = Path("build/output/logs")
+print(f"Path parts: {p.parts}")
+print(f"Parent dir: {p.parent}")`
+        };
+
+        function loadPreset(num) {
+            if (presets[num]) {
+                liveCodeInput.value = presets[num];
+                showToast(`Preset ${num} loaded!`);
+            }
+        }
+
+        // Live Simulated Python Runner Engine
+        runCodeBtn.addEventListener('click', () => {
+            const rawCode = liveCodeInput.value;
+            terminalOutput.innerHTML = `<span style="color: #94a3b8;">&gt; Executing Python Module Pipeline...</span>`;
+            
+            setTimeout(() => {
+                try {
+                    let outputLines = [];
+                    if (rawCode.includes("Issued At") || rawCode.includes("datetime")) {
+                        outputLines.push("Issued At: 2026-08-17 10:30");
+                        outputLines.push("Token Expiry: 2026-08-24 12:30");
+                    } else if (rawCode.includes("sys.argv") || rawCode.includes("Flags detected")) {
+                        outputLines.push("Program: script.py");
+                        outputLines.push("Flags detected: ['--port', '8080', '--debug']");
+                    } else if (rawCode.includes("Pathlib") || rawCode.includes("Path parts")) {
+                        outputLines.push("Path parts: ('build', 'output', 'logs')");
+                        outputLines.push("Parent dir: build\\output");
+                    } else {
+                        outputLines.push("Module executed successfully.");
+                    }
+
+                    if (outputLines.length > 0) {
+                        terminalOutput.innerHTML = outputLines.map(l => `&gt; ${l}`).join('<br>');
+                    } else {
+                        terminalOutput.innerHTML = `&gt; Code executed successfully.`;
+                    }
+                } catch (e) {
+                    terminalOutput.innerHTML = `<span style="color: #ef4444;">&gt; Error: ${e.message}</span>`;
+                }
+            }, 250);
+        });
+
+        // Initialize First Slide
+        updateSlide(1);
+    </script>
+</body>
+</html>
